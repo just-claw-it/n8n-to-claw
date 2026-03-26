@@ -1,0 +1,13 @@
+# Local / small-VM deployment — web UI + API on port 3847
+# Usage: docker compose up --build
+#        open http://localhost:3847
+
+services:
+  web:
+    build: .
+    ports:
+      - "${PORT:-3847}:3847"
+    environment:
+      PORT: "3847"
+      NODE_ENV: production
+    restart: unless-stopped

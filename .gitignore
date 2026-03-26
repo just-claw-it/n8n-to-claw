@@ -1,0 +1,28 @@
+node_modules/
+dist/
+
+# Web UI (separate package in web/)
+web/node_modules/
+web/dist/
+
+# Environment — never commit real credentials
+.env
+credentials.env
+*.credentials.env
+
+# Generated skill output (local runs)
+~/.openclaw/
+
+# OS / tooling
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*~
+*.log
+coverage/
+
+# Editor
+.vscode/
+.idea/
+*.swp

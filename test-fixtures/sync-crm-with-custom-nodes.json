@@ -1,0 +1,131 @@
+{
+  "id": "wf-4001",
+  "name": "Sync CRM Contacts to Google Sheets",
+  "nodes": [
+    {
+      "id": "e5f6a7b8-0001-0001-0001-000000000001",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 1 }]
+        }
+      }
+    },
+    {
+      "id": "e5f6a7b8-0002-0002-0002-000000000002",
+      "name": "Fetch CRM Contacts",
+      "type": "n8n-nodes-community.customCrm",
+      "typeVersion": 1,
+      "position": [300, 300],
+      "parameters": {
+        "resource": "contact",
+        "operation": "getAll",
+        "limit": 100,
+        "filters": {
+          "updatedAfter": "={{ $now.minus(1, 'hour').toISO() }}"
+        }
+      },
+      "credentials": {
+        "customCrmApi": {
+          "id": "cred-crm-01",
+          "name": "Production CRM"
+        }
+      }
+    },
+    {
+      "id": "e5f6a7b8-0003-0003-0003-000000000003",
+      "name": "Map Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [500, 300],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "f-1", "name": "Name", "value": "={{ $json.firstName }} {{ $json.lastName }}", "type": "string" },
+            { "id": "f-2", "name": "Email", "value": "={{ $json.email }}", "type": "string" },
+            { "id": "f-3", "name": "Company", "value": "={{ $json.company.name }}", "type": "string" },
+            { "id": "f-4", "name": "Last Updated", "value": "={{ $json.updatedAt }}", "type": "string" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e5f6a7b8-0004-0004-0004-000000000004",
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 1,
+      "position": [700, 300],
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "Email"
+      }
+    },
+    {
+      "id": "e5f6a7b8-0005-0005-0005-000000000005",
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [900, 300],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "value": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+        },
+        "sheetName": "Contacts",
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": ["Email"]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cred-gsheets-01",
+          "name": "Google Workspace"
+        }
+      }
+    },
+    {
+      "id": "e5f6a7b8-0006-0006-0006-000000000006",
+      "name": "Annotation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "parameters": {
+        "content": "## CRM → Google Sheets Sync\nRuns every hour, fetches updated contacts from our custom CRM,\nand upserts them into the shared Google Sheet."
+      }
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [{ "node": "Fetch CRM Contacts", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch CRM Contacts": {
+      "main": [
+        [{ "node": "Map Fields", "type": "main", "index": 0 }]
+      ]
+    },
+    "Map Fields": {
+      "main": [
+        [{ "node": "Remove Duplicates", "type": "main", "index": 0 }]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [{ "node": "Update Google Sheet", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "id": "tag-crm", "name": "crm" }, { "id": "tag-sync", "name": "sync" }],
+  "meta": { "instanceId": "prod-instance-01" },
+  "pinData": {},
+  "staticData": { "lastRun": "2025-01-15T10:00:00.000Z" },
+  "versionId": "v-4001-5"
+}

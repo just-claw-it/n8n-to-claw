@@ -1,0 +1,16 @@
+[
+  {
+    "nodeId": "d4e5f6a7-0004-0004-0004-000000000004",
+    "nodeName": "Fetch Story Details",
+    "nodeType": "n8n-nodes-base.httpRequest",
+    "reason": "expression_present",
+    "detail": "Node parameters contain n8n expressions (={{...}}). These require runtime resolution and will be annotated in the generated skill."
+  },
+  {
+    "nodeId": "d4e5f6a7-0006-0006-0006-000000000006",
+    "nodeName": "Send Email",
+    "nodeType": "n8n-nodes-base.emailSend",
+    "reason": "credential_reference",
+    "detail": "Node uses credentials: smtp(Company SMTP). Add to credentials.example.env."
+  }
+]

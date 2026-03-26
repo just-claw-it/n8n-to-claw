@@ -1,0 +1,131 @@
+{
+  "id": "wf-2001",
+  "name": "AI Support Chatbot",
+  "nodes": [
+    {
+      "id": "c3d4e5f6-0001-0001-0001-000000000001",
+      "name": "Chat Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "lastNode"
+      },
+      "webhookId": "wh-chat-01"
+    },
+    {
+      "id": "c3d4e5f6-0002-0002-0002-000000000002",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful customer support agent for Acme Corp. Answer questions about our products, pricing, and policies. Be concise and friendly."
+        }
+      }
+    },
+    {
+      "id": "c3d4e5f6-0003-0003-0003-000000000003",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [200, 500],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 1024
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "cred-openai-01",
+          "name": "OpenAI Production"
+        }
+      }
+    },
+    {
+      "id": "c3d4e5f6-0004-0004-0004-000000000004",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1,
+      "position": [400, 500],
+      "parameters": {
+        "sessionKey": "={{ $json.sessionId }}",
+        "contextWindowLength": 10
+      }
+    },
+    {
+      "id": "c3d4e5f6-0005-0005-0005-000000000005",
+      "name": "FAQ Lookup Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1,
+      "position": [600, 500],
+      "parameters": {
+        "name": "faq_lookup",
+        "description": "Search the Acme Corp FAQ database. Input should be a search query string.",
+        "method": "GET",
+        "url": "https://api.acme.com/faq/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "q", "value": "={query}" }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred-acme-01",
+          "name": "Acme API Key"
+        }
+      }
+    },
+    {
+      "id": "c3d4e5f6-0006-0006-0006-000000000006",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [700, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"reply\": $json.output, \"sessionId\": $json.sessionId } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [{ "node": "AI Agent", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [{ "node": "AI Agent", "type": "ai_memory", "index": 0 }]
+      ]
+    },
+    "FAQ Lookup Tool": {
+      "ai_tool": [
+        [{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "id": "tag-ai", "name": "ai" }, { "id": "tag-support", "name": "support" }],
+  "meta": { "instanceId": "prod-instance-01" },
+  "pinData": {},
+  "versionId": "v-2001-7"
+}

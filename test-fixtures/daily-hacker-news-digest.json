@@ -1,0 +1,119 @@
+{
+  "id": "wf-3001",
+  "name": "Daily Hacker News Digest",
+  "nodes": [
+    {
+      "id": "d4e5f6a7-0001-0001-0001-000000000001",
+      "name": "Every Morning at 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      }
+    },
+    {
+      "id": "d4e5f6a7-0002-0002-0002-000000000002",
+      "name": "Fetch Top Stories",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [300, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+        "options": {
+          "timeout": 10000
+        }
+      }
+    },
+    {
+      "id": "d4e5f6a7-0003-0003-0003-000000000003",
+      "name": "Take Top 10",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "parameters": {
+        "maxItems": 10
+      }
+    },
+    {
+      "id": "d4e5f6a7-0004-0004-0004-000000000004",
+      "name": "Fetch Story Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [700, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://hacker-news.firebaseio.com/v0/item/{{ $json.id }}.json",
+        "options": {
+          "timeout": 10000
+        }
+      }
+    },
+    {
+      "id": "d4e5f6a7-0005-0005-0005-000000000005",
+      "name": "Format Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const stories = $input.all().map((item, i) => {\n  const d = item.json;\n  return `${i + 1}. ${d.title} (${d.score} points)\\n   ${d.url || 'https://news.ycombinator.com/item?id=' + d.id}\\n   ${d.descendants || 0} comments`;\n});\n\nreturn [{ json: { digest: stories.join('\\n\\n'), count: stories.length, date: new Date().toISOString().slice(0, 10) } }];"
+      }
+    },
+    {
+      "id": "d4e5f6a7-0006-0006-0006-000000000006",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "parameters": {
+        "fromEmail": "digest@example.com",
+        "toEmail": "team@example.com",
+        "subject": "=HN Digest — {{ $json.date }} ({{ $json.count }} stories)",
+        "text": "={{ $json.digest }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "cred-smtp-01",
+          "name": "Company SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Morning at 8am": {
+      "main": [
+        [{ "node": "Fetch Top Stories", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Top Stories": {
+      "main": [
+        [{ "node": "Take Top 10", "type": "main", "index": 0 }]
+      ]
+    },
+    "Take Top 10": {
+      "main": [
+        [{ "node": "Fetch Story Details", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Story Details": {
+      "main": [
+        [{ "node": "Format Digest", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Digest": {
+      "main": [
+        [{ "node": "Send Email", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "id": "tag-digest", "name": "digest" }],
+  "meta": { "instanceId": "prod-instance-01" },
+  "versionId": "v-3001-2"
+}

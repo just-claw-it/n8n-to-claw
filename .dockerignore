@@ -1,0 +1,32 @@
+# Dependencies and build outputs (rebuilt in image)
+node_modules
+dist
+web/node_modules
+web/dist
+
+# Git and CI (not needed for image)
+.git
+.github
+.gitignore
+
+# Tests (tsconfig excludes them; keeps context small)
+**/*.test.ts
+
+# Docs and examples (not required at runtime)
+docs
+examples
+skills
+
+# Local env and credentials
+.env
+.env.*
+credentials.env
+
+# Editor / tooling
+.cursor
+.vscode
+.idea
+
+coverage
+*.log
+.DS_Store

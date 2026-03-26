@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Typecheck, Test, Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke test binary
+        run: node dist/cli/index.js --help
+
+      - name: Install web UI dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Web UI typecheck
+        working-directory: web
+        run: npm run typecheck
+
+      - name: Web UI build
+        working-directory: web
+        run: npm run build
+
+      - name: Docker image build
+        if: matrix.node-version == 20
+        run: docker build -t n8n-to-claw:ci .

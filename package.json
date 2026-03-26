@@ -1,0 +1,36 @@
+{
+  "name": "n8n-to-claw",
+  "version": "0.3.0",
+  "description": "A CLI tool that converts n8n workflow JSON into OpenClaw-compatible skills",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/just-claw-it/n8n-to-claw.git"
+  },
+  "bugs": {
+    "url": "https://github.com/just-claw-it/n8n-to-claw/issues"
+  },
+  "homepage": "https://github.com/just-claw-it/n8n-to-claw#readme",
+  "engines": { "node": ">=20" },
+  "bin": {
+    "n8n-to-claw": "./dist/cli/index.js"
+  },
+  "keywords": ["n8n", "openclaw", "workflow", "automation", "cli", "llm", "typescript", "docker"],
+  "files": ["dist", "README.md", "LICENSE"],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/cli/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "typescript": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "vitest": "^1.6.0"
+  }
+}
