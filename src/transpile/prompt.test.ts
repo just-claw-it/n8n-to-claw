@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildTranspilePrompt, buildRetryPrompt } from "../transpile/prompt.js";
+import { buildTranspilePrompt, buildRetryPrompt, PROMPT_VERSION } from "../transpile/prompt.js";
 import type { WorkflowIR } from "../ir/types.js";
 
 // ---------------------------------------------------------------------------
@@ -164,6 +164,11 @@ describe("buildTranspilePrompt()", () => {
   it("system prompt requires snake_case name", () => {
     const [system] = buildTranspilePrompt(BASE_IR);
     expect(system?.content).toContain("snake_case");
+  });
+
+  it("system prompt includes prompt version marker", () => {
+    const [system] = buildTranspilePrompt(BASE_IR);
+    expect(system?.content).toContain(`Prompt-Version: ${PROMPT_VERSION}`);
   });
 
   it("system prompt requires single-line metadata JSON", () => {

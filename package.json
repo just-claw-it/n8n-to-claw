@@ -24,7 +24,9 @@
     "start": "node dist/cli/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "eval:prompt": "npm run build && node dist/evals/run-prompt-eval.js",
+    "eval:prompt:update": "npm run build && node dist/evals/run-prompt-eval.js docs/prompt-evals/prompt-v1-baseline.json"
   },
   "dependencies": {
     "typescript": "^5.4.0"

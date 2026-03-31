@@ -17,6 +17,7 @@ import { parse } from "./parse/parser.js";
 import { transpile } from "./transpile/transpile.js";
 import { packageSkill } from "./package/package.js";
 import * as llmModule from "./transpile/llm.js";
+import { validateTypeScript } from "./transpile/validate.js";
 
 // ---------------------------------------------------------------------------
 // Canned LLM response matching the fixture workflow
@@ -136,6 +137,14 @@ async function fileExists(p: string): Promise<boolean> {
   }
 }
 
+let hasTscAvailableCache: boolean | undefined;
+async function hasTscAvailable(): Promise<boolean> {
+  if (hasTscAvailableCache !== undefined) return hasTscAvailableCache;
+  const probe = await validateTypeScript("const ok: string = 'x'; console.log(ok);");
+  hasTscAvailableCache = !probe.error?.includes("tsc not found");
+  return hasTscAvailableCache;
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -233,7 +242,11 @@ describe("Full pipeline integration (mocked LLM)", () => {
     const ir = parse(raw);
     const result = await transpile(ir);
 
-    expect(result.status).toBe("success");
+    if (await hasTscAvailable()) {
+      expect(result.status).toBe("success");
+      return;
+    }
+    expect(result.status).toBe("validation_skip");
   }, 30_000);
 
   it("status is draft when mock LLM consistently returns broken TypeScript", async () => {
@@ -254,8 +267,12 @@ const y = {{{;          // syntax error
     const ir = parse(raw);
     const result = await transpile(ir);
 
-    expect(result.status).toBe("draft");
-    expect(result.validationError).toBeDefined();
+    if (await hasTscAvailable()) {
+      expect(result.status).toBe("draft");
+      expect(result.validationError).toBeDefined();
+      return;
+    }
+    expect(result.status).toBe("validation_skip");
   }, 30_000);
 
   it("callLLM is called twice on first validation failure (retry)", async () => {
@@ -272,6 +289,12 @@ const y = {{{;          // syntax error
     const raw = await loadFromFile("test-fixtures/notify-slack-on-postgres.json");
     const ir = parse(raw);
     await transpile(ir);
+
+    if (!(await hasTscAvailable())) {
+      // Without tsc, transpile short-circuits after one attempt.
+      expect(spy).toHaveBeenCalledTimes(1);
+      return;
+    }
 
     // Should have been called exactly twice (attempt + retry)
     expect(spy).toHaveBeenCalledTimes(2);

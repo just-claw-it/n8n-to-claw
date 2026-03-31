@@ -70,6 +70,23 @@ The retry prompt includes the full compiler error from attempt 1. This is the
 single most effective intervention for fixing generated TypeScript — the LLM
 can see exactly what went wrong.
 
+## Prompt versioning and eval harness
+
+Prompt evolution is tracked with a version marker in the system prompt:
+
+- `src/transpile/prompt.ts` exports `PROMPT_VERSION`
+- `buildTranspilePrompt()` prefixes the system message with
+  `Prompt-Version: <version>`
+
+Evaluation is fixture-based (`test-fixtures/*.json`) and lives in `src/evals/`:
+
+- `prompt-eval.ts` builds a deterministic report with per-fixture metrics
+- `run-prompt-eval.ts` prints or writes the report JSON
+- `prompt-eval.test.ts` validates report consistency and (optionally) exact
+  baseline parity when `docs/prompt-evals/prompt-v1-baseline.json` exists
+
+This keeps prompt changes measurable and prevents accidental drift.
+
 ## tsc validation
 
 `src/transpile/validate.ts` writes the generated `skill.ts` to a temp directory

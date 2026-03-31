@@ -1,0 +1,81 @@
+{
+  "promptVersion": "v1",
+  "fixtureCount": 5,
+  "totals": {
+    "nodes": 27,
+    "edges": 22,
+    "warnings": 26,
+    "unknownNodes": 1,
+    "expressionNodes": 13,
+    "credentialRefs": 8,
+    "promptChars": 44573,
+    "estimatedTokens": 11145
+  },
+  "fixtures": [
+    {
+      "fixture": "ai-support-chatbot.json",
+      "workflowName": "AI Support Chatbot",
+      "triggerType": "webhook",
+      "nodeCount": 6,
+      "edgeCount": 5,
+      "warningCount": 7,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 3,
+      "credentialRefCount": 2,
+      "promptChars": 9390,
+      "estimatedTokens": 2348
+    },
+    {
+      "fixture": "daily-hacker-news-digest.json",
+      "workflowName": "Daily Hacker News Digest",
+      "triggerType": "schedule",
+      "nodeCount": 6,
+      "edgeCount": 5,
+      "warningCount": 3,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 2,
+      "credentialRefCount": 1,
+      "promptChars": 8536,
+      "estimatedTokens": 2134
+    },
+    {
+      "fixture": "github-webhook-to-slack.json",
+      "workflowName": "GitHub PR Review Notifier",
+      "triggerType": "webhook",
+      "nodeCount": 5,
+      "edgeCount": 4,
+      "warningCount": 5,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 3,
+      "credentialRefCount": 1,
+      "promptChars": 8764,
+      "estimatedTokens": 2191
+    },
+    {
+      "fixture": "notify-slack-on-postgres.json",
+      "workflowName": "Notify Slack on New Postgres Row",
+      "triggerType": "schedule",
+      "nodeCount": 5,
+      "edgeCount": 4,
+      "warningCount": 6,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 3,
+      "credentialRefCount": 2,
+      "promptChars": 9010,
+      "estimatedTokens": 2253
+    },
+    {
+      "fixture": "sync-crm-with-custom-nodes.json",
+      "workflowName": "Sync CRM Contacts to Google Sheets",
+      "triggerType": "schedule",
+      "nodeCount": 5,
+      "edgeCount": 4,
+      "warningCount": 5,
+      "unknownNodeCount": 1,
+      "expressionNodeCount": 2,
+      "credentialRefCount": 2,
+      "promptChars": 8873,
+      "estimatedTokens": 2219
+    }
+  ]
+}

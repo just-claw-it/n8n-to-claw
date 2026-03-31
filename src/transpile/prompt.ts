@@ -2,6 +2,8 @@ import type { WorkflowIR, IRNode } from "../ir/types.js";
 import type { LLMMessage } from "./llm.js";
 import { logger } from "../utils/logger.js";
 
+export const PROMPT_VERSION = "v1";
+
 // ---------------------------------------------------------------------------
 // System prompt — constant across all transpilations.
 // ---------------------------------------------------------------------------
@@ -277,8 +279,9 @@ ${credBlock}
 ${branchNote ? `\n${branchNote}` : ""}
 ${warnBlock}`.trim();
 
+  const versionedSystemPrompt = `Prompt-Version: ${PROMPT_VERSION}\n\n${SYSTEM_PROMPT}`;
   const messages: LLMMessage[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: versionedSystemPrompt },
     { role: "user", content: userMessage },
   ];
 

@@ -301,6 +301,26 @@ npm test
 npm run typecheck
 ```
 
+### Prompt evals (versioned prompt quality checks)
+
+The transpile system prompt is explicitly versioned (`PROMPT_VERSION` in
+`src/transpile/prompt.ts`). To make prompt changes reviewable, the repo includes
+a fixture-based eval harness in `src/evals/`.
+
+Commands:
+
+```bash
+# Print the current prompt eval report to stdout
+npm run eval:prompt
+
+# Regenerate the baseline snapshot for the current prompt version
+npm run eval:prompt:update
+```
+
+The baseline path is `docs/prompt-evals/prompt-v1-baseline.json`. When this file
+is present, `src/evals/prompt-eval.test.ts` enforces exact parity with the
+generated report.
+
 Or run `./scripts/setup.sh` from the repo root to install, typecheck, test, and build in one go.
 
 CI runs on **Node.js 20** and **22** (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)): typecheck, tests, CLI build, web install/typecheck/build, and a Docker image build on Node 20.
