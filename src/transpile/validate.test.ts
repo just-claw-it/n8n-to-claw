@@ -19,11 +19,20 @@ const SYNTAX_ERROR_TS = `
 const x = {{{;
 `;
 
+function isValidationSkipped(error: string | undefined): boolean {
+  if (error === undefined) return false;
+  return (
+    error.includes("skipping validation") ||
+    error.includes("tsc not found") ||
+    error.includes("Could not resolve the `typescript` package")
+  );
+}
+
 describe("validateTypeScript()", () => {
   it("returns valid:true for well-typed code", async () => {
     const result = await validateTypeScript(VALID_TS);
     // If tsc is unavailable the result is still valid:false with a specific message
-    if (result.error?.includes("tsc not found")) {
+    if (isValidationSkipped(result.error)) {
       console.warn("tsc not available in this environment — skipping positive assertion");
       return;
     }
@@ -32,7 +41,7 @@ describe("validateTypeScript()", () => {
 
   it("returns valid:false for a type error", async () => {
     const result = await validateTypeScript(INVALID_TS);
-    if (result.error?.includes("tsc not found")) {
+    if (isValidationSkipped(result.error)) {
       console.warn("tsc not available — skipping");
       return;
     }
@@ -42,7 +51,7 @@ describe("validateTypeScript()", () => {
 
   it("returns valid:false for a syntax error", async () => {
     const result = await validateTypeScript(SYNTAX_ERROR_TS);
-    if (result.error?.includes("tsc not found")) {
+    if (isValidationSkipped(result.error)) {
       console.warn("tsc not available — skipping");
       return;
     }

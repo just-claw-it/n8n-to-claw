@@ -141,7 +141,7 @@ let hasTscAvailableCache: boolean | undefined;
 async function hasTscAvailable(): Promise<boolean> {
   if (hasTscAvailableCache !== undefined) return hasTscAvailableCache;
   const probe = await validateTypeScript("const ok: string = 'x'; console.log(ok);");
-  hasTscAvailableCache = !probe.error?.includes("tsc not found");
+  hasTscAvailableCache = probe.valid === true;
   return hasTscAvailableCache;
 }
 

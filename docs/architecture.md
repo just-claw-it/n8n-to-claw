@@ -82,17 +82,26 @@ Evaluation is fixture-based (`test-fixtures/*.json`) and lives in `src/evals/`:
 
 - `prompt-eval.ts` builds a deterministic report with per-fixture metrics
 - `run-prompt-eval.ts` prints or writes the report JSON
+- `transpile-quality-eval.ts` simulates first/second-attempt quality scenarios
+  and reports parseability, retry usage, and outcome distribution
 - `prompt-eval.test.ts` validates report consistency and (optionally) exact
   baseline parity when `docs/prompt-evals/prompt-v1-baseline.json` exists
+- `transpile-quality-eval.test.ts` compares to
+  `docs/prompt-evals/transpile-quality-v1-baseline.json` when present and when
+  `tscAvailable` matches the baseline (so environments without `tsc` do not
+  fail the snapshot)
 
 This keeps prompt changes measurable and prevents accidental drift.
 
 ## tsc validation
 
 `src/transpile/validate.ts` writes the generated `skill.ts` to a temp directory
-alongside a minimal `tsconfig.json` and runs `tsc --noEmit`. The tsconfig
-references our own `node_modules/@types/node` so the generated code can use
-Node.js built-ins without the user needing a global `@types/node`.
+alongside a minimal `tsconfig.json` and runs the compiler via
+`node <typescript>/lib/tsc.js --project tsconfig.json` (not `bin/tsc` directly).
+On Windows, spawning `node_modules/typescript/bin/tsc` is unreliable because it
+is a Unix shebang script, not a native executable. The tsconfig references our
+own `node_modules/@types/node` so the generated code can use Node.js built-ins
+without the user needing a global `@types/node`.
 
 `typescript` is a runtime dependency (not devDependency) because `tsc` is
 invoked at runtime. Making it a `peerDependency` would silently break validation

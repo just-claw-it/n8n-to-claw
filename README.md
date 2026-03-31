@@ -315,11 +315,23 @@ npm run eval:prompt
 
 # Regenerate the baseline snapshot for the current prompt version
 npm run eval:prompt:update
+
+# Run deterministic transpile-quality scenarios (parseability/retry/outcome)
+npm run eval:quality
+
+# Regenerate the transpile quality baseline snapshot (same prompt version tag)
+npm run eval:quality:update
 ```
 
-The baseline path is `docs/prompt-evals/prompt-v1-baseline.json`. When this file
-is present, `src/evals/prompt-eval.test.ts` enforces exact parity with the
-generated report.
+The prompt-eval baseline path is `docs/prompt-evals/prompt-v1-baseline.json`. When
+this file is present, `src/evals/prompt-eval.test.ts` enforces exact parity with
+the generated report.
+
+The transpile-quality baseline path is
+`docs/prompt-evals/transpile-quality-v1-baseline.json`. When present,
+`src/evals/transpile-quality-eval.test.ts` enforces parity only when
+`report.tscAvailable` matches the baseline (so machines without `tsc` on PATH do
+not fail the snapshot).
 
 Or run `./scripts/setup.sh` from the repo root to install, typecheck, test, and build in one go.
 

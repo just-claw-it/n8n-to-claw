@@ -1,9 +1,10 @@
 import { writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 export interface ValidationResult {
   valid: boolean;
@@ -33,7 +34,7 @@ export async function validateTypeScript(
   // Minimal tsconfig for validation — strict but no imports to resolve.
   // typeRoots points at our own node_modules so generated code can use Node.js
   // built-ins (node:process, node:fs, etc.) without the user needing @types/node.
-  const ownNodeModules = new URL("../../node_modules", import.meta.url).pathname;
+  const ownNodeModules = fileURLToPath(new URL("../../node_modules", import.meta.url));
   const tsconfig = JSON.stringify({
     compilerOptions: {
       target: "ES2022",
@@ -53,15 +54,16 @@ export async function validateTypeScript(
     await writeFile(filePath, code, "utf-8");
     await writeFile(tsconfigPath, tsconfig, "utf-8");
 
-    const tscBin = resolveTsc();
-    if (tscBin === null) {
+    const tscCmd = resolveTscCommand();
+    if (tscCmd === null) {
       return {
         valid: false,
-        error: "tsc not found on PATH or in package node_modules — skipping validation.",
+        error:
+          "Could not resolve the `typescript` package to run `lib/tsc.js` — skipping validation.",
       };
     }
 
-    return await runTsc(dir, tscBin);
+    return await runTsc(dir, tscCmd);
   } finally {
     await import("node:fs/promises")
       .then((fs) => fs.rm(dir, { recursive: true, force: true }))
@@ -70,34 +72,31 @@ export async function validateTypeScript(
 }
 
 /**
- * Resolve the tsc binary path.
- * Priority:
- *   1. The tsc that ships with this package's own TypeScript devDependency
- *   2. tsc on PATH (system install)
- * Returns null if neither is found.
+ * Resolve how to run the TypeScript compiler.
+ *
+ * We run `node path/to/typescript/lib/tsc.js` (not `bin/tsc`) so validation works
+ * on Windows: `bin/tsc` is a Unix shebang script and is often not spawnable as
+ * an executable there.
  */
-function resolveTsc(): string | null {
-  // 1. Try to resolve from our own package's node_modules using createRequire
+function resolveTscCommand(): { exe: string; args: string[] } | null {
   try {
     const require = createRequire(import.meta.url);
     const tscMain = require.resolve("typescript");
-    // typescript resolves to .../typescript/lib/typescript.js
-    // tsc is at .../typescript/bin/tsc
-    const tscBin = join(tscMain, "..", "..", "bin", "tsc");
-    return tscBin;
+    const tscJs = join(dirname(tscMain), "tsc.js");
+    return {
+      exe: process.execPath,
+      args: [tscJs, "--project", "tsconfig.json"],
+    };
   } catch {
-    // TypeScript not installed — fall through
+    return null;
   }
-
-  // 2. Fall back to PATH (e.g. global tsc install)
-  return "tsc";
 }
 
 const TSC_TIMEOUT_MS = 30_000;
 
-function runTsc(cwd: string, tscBin: string): Promise<ValidationResult> {
+function runTsc(cwd: string, command: { exe: string; args: string[] }): Promise<ValidationResult> {
   return new Promise((resolve) => {
-    const proc = spawn(tscBin, ["--project", "tsconfig.json"], {
+    const proc = spawn(command.exe, command.args, {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
     });
