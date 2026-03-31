@@ -133,18 +133,31 @@ Required when running the CLI (not needed for tests):
 LLM_BASE_URL   — OpenAI-compatible API base URL
 LLM_API_KEY    — API key
 LLM_MODEL      — Model name (gpt-4o or claude-sonnet tier minimum)
+LLM_TIMEOUT_MS — optional; local Ollama often needs 600000+
+LLM_MAX_TOKENS — optional; default 4096; lower can speed local models (truncation risk)
 ```
+
+`n8n-to-claw check-llm` — tiny probe using the same `LLM_*` as `convert`; use to verify env and network (Ollama on same host, CI cannot reach laptop localhost, etc.).
 
 ## Test strategy
 
 - Unit tests are co-located with source files (`*.test.ts`)
 - Integration tests are in `src/integration.test.ts` and use `vi.spyOn` to mock
   `callLLM` — no real LLM calls happen in CI
+- Golden transpile snapshots: `test-fixtures/golden-transpile/<stem>/SKILL.md` +
+  `skill.ts` per workflow; `src/evals/golden-transpile.test.ts` asserts mocked
+  transpile output matches those files
 - `src/transpile/validate.test.ts` invokes real `tsc` against known-good and
   known-bad TypeScript snippets
 - GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, tests, CLI build,
   smoke `--help`, then `web/` install, typecheck, and Vite build; on Node 20 only,
   `docker build` verifies the `Dockerfile`
+
+## Local improvement backlog (optional)
+
+Maintainers may keep a private, **gitignored** checklist at the repo root:
+`roadmap.local.md` (pattern `*.local.md` in `.gitignore`). Use it for a personal
+backlog of high-impact enhancements; it is not shipped with the repository.
 
 ## Commit conventions
 

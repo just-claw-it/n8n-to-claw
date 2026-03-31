@@ -119,7 +119,6 @@ async function runAttempt(
   validationResult: { valid: boolean; error?: string };
 }> {
   const llmResponse = await callLLM(config, messages, {
-    maxTokens: 4096,
     temperature: 0.2,
   });
 

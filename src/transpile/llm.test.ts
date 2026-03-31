@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { callLLM, loadLLMConfig, LLMError, type LLMConfig } from "../transpile/llm.js";
+import {
+  callLLM,
+  formatLlmNetworkFailureMessage,
+  loadLLMConfig,
+  LLMError,
+  probeLlmConnection,
+  type LLMConfig,
+} from "../transpile/llm.js";
 
 const BASE_CONFIG: LLMConfig = {
   baseUrl: "https://api.example.com/v1",
@@ -61,6 +68,19 @@ describe("loadLLMConfig()", () => {
     delete process.env["LLM_API_KEY"];
     delete process.env["LLM_MODEL"];
   });
+
+  it("reads LLM_MAX_TOKENS from env", () => {
+    process.env["LLM_BASE_URL"] = "https://x.com/v1";
+    process.env["LLM_API_KEY"] = "k";
+    process.env["LLM_MODEL"] = "m";
+    process.env["LLM_MAX_TOKENS"] = "2048";
+    const cfg = loadLLMConfig();
+    expect(cfg.maxOutputTokens).toBe(2048);
+    delete process.env["LLM_MAX_TOKENS"];
+    delete process.env["LLM_BASE_URL"];
+    delete process.env["LLM_API_KEY"];
+    delete process.env["LLM_MODEL"];
+  });
 });
 
 describe("callLLM()", () => {
@@ -73,6 +93,21 @@ describe("callLLM()", () => {
     const result = await callLLM(BASE_CONFIG, [{ role: "user", content: "hi" }]);
     expect(result.content).toBe("Hello from the LLM");
     expect(result.tokensUsed).toBe(42);
+    const body = JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string) as { max_tokens: number };
+    expect(body.max_tokens).toBe(4096);
+  });
+
+  it("sends max_tokens from LLMConfig.maxOutputTokens", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(GOOD_RESPONSE, { status: 200 })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await callLLM(
+      { ...BASE_CONFIG, maxOutputTokens: 2048 },
+      [{ role: "user", content: "hi" }]
+    );
+    const body = JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string) as { max_tokens: number };
+    expect(body.max_tokens).toBe(2048);
   });
 
   it("throws LLMError on 401", async () => {
@@ -187,5 +222,55 @@ describe("callLLM()", () => {
     const cfg: LLMConfig = { ...BASE_CONFIG, maxRetries: 2 };
     await expect(callLLM(cfg, [{ role: "user", content: "hi" }]))
       .rejects.toThrow("after 2 attempt(s)");
+  });
+
+  it("includes localhost / Ollama hints when fetch fails against 127.0.0.1", async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error("ECONNREFUSED"));
+    vi.stubGlobal("fetch", fetchMock);
+    const cfg: LLMConfig = {
+      ...BASE_CONFIG,
+      baseUrl: "http://127.0.0.1:11434/v1",
+      maxRetries: 1,
+    };
+    const err = await callLLM(cfg, [{ role: "user", content: "hi" }]).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(LLMError);
+    expect((err as LLMError).message).toContain("Ollama");
+    expect((err as LLMError).message).toContain("check-llm");
+  });
+});
+
+describe("formatLlmNetworkFailureMessage()", () => {
+  it("adds local-API hints for localhost URLs", () => {
+    const m = formatLlmNetworkFailureMessage("http://127.0.0.1:11434/v1", 2, "fail");
+    expect(m).toContain("Local OpenAI-compatible API");
+    expect(m).toContain("check-llm");
+  });
+
+  it("adds generic hints for remote URLs", () => {
+    const m = formatLlmNetworkFailureMessage("https://api.example.com/v1", 1, "fail");
+    expect(m).toContain("firewall");
+    expect(m).toContain("check-llm");
+  });
+});
+
+describe("probeLlmConnection()", () => {
+  it("returns ok on HTTP 200", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { status: 200 })));
+    const r = await probeLlmConnection(BASE_CONFIG);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.message).toContain("LLM endpoint OK");
+  });
+
+  it("returns failure with HTTP body snippet on non-OK", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("nope", { status: 503 }))
+    );
+    const r = await probeLlmConnection(BASE_CONFIG);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.message).toContain("503");
+      expect(r.message).toContain("nope");
+    }
   });
 });

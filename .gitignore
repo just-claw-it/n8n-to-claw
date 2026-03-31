@@ -26,3 +26,6 @@ coverage/
 .vscode/
 .idea/
 *.swp
+
+# Local-only notes (roadmap, scratch) — not committed
+*.local.md

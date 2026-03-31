@@ -93,6 +93,14 @@ Evaluation is fixture-based (`test-fixtures/*.json`) and lives in `src/evals/`:
 
 This keeps prompt changes measurable and prevents accidental drift.
 
+## Golden transpile snapshots
+
+`test-fixtures/golden-transpile/<workflow-stem>/` stores expected `SKILL.md` and
+`skill.ts` for each representative workflow JSON. Tests mock `callLLM` to return
+exactly those bodies and assert `transpile()` output matches after
+`parseLLMOutput` — guarding the fenced-block parser and transpile wiring without
+a real LLM.
+
 ## tsc validation
 
 `src/transpile/validate.ts` writes the generated `skill.ts` to a temp directory

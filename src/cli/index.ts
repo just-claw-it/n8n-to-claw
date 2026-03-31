@@ -8,6 +8,7 @@
 //   n8n-to-claw convert workflow.json --dry-run
 //   n8n-to-claw convert workflow.json --inspect
 //   n8n-to-claw convert workflow.json --verbose
+//   n8n-to-claw check-llm
 // ---------------------------------------------------------------------------
 
 import { parseArgs } from "node:util";
@@ -16,7 +17,7 @@ import { loadFromFile } from "../adapters/file.js";
 import { loadFromApi } from "../adapters/api.js";
 import { parse, ParseError } from "../parse/parser.js";
 import { transpile, TranspileError } from "../transpile/transpile.js";
-import { LLMError } from "../transpile/llm.js";
+import { LLMError, loadLLMConfig, probeLlmConnection } from "../transpile/llm.js";
 import { buildTranspilePrompt } from "../transpile/prompt.js";
 import { packageSkill } from "../package/package.js";
 import { enableVerbose, logger } from "../utils/logger.js";
@@ -31,6 +32,7 @@ function printHelp(): void {
 n8n-to-claw — convert n8n workflows to OpenClaw skills
 
 Usage:
+  n8n-to-claw check-llm
   n8n-to-claw convert <workflow.json>
   n8n-to-claw convert --n8n-url <url> --api-key <key> --workflow-id <id>
 
@@ -53,6 +55,9 @@ Exit codes:
   0                Success — skill written and TypeScript validated
   1                Error — invalid input, LLM failure, or I/O error
   2                Draft — skill written to draft/ (TypeScript validation failed)
+
+Commands:
+  check-llm        Send a tiny chat request; verify LLM_* env and network (Ollama, etc.)
 
 Environment variables (required for LLM):
   LLM_BASE_URL     OpenAI-compatible API base URL
@@ -176,6 +181,9 @@ function fatalError(label: string, err: unknown): never {
     if (err.statusCode === 404) process.stderr.write("\n  → Check LLM_BASE_URL and LLM_MODEL.\n");
     if (err.statusCode === 429) process.stderr.write("\n  → You are rate limited. Wait a moment or increase LLM_MAX_RETRIES.\n");
     if (msg.includes("timed out")) process.stderr.write(`\n  → Increase LLM_TIMEOUT_MS (current: ${process.env["LLM_TIMEOUT_MS"] ?? "60000"}ms).\n`);
+    if (msg.includes("Network error calling LLM") && !msg.includes("check-llm")) {
+      process.stderr.write("\n  → Run n8n-to-claw check-llm with the same LLM_* environment.\n");
+    }
   }
   if (err instanceof ParseError) {
     process.stderr.write("\n  → Ensure the file is a valid n8n workflow JSON export.\n");
@@ -216,7 +224,32 @@ function runInspect(ir: ReturnType<typeof parse>): void {
 // Main
 // ---------------------------------------------------------------------------
 
+async function runCheckLlmCommand(): Promise<void> {
+  let config;
+  try {
+    config = loadLLMConfig();
+  } catch (err: unknown) {
+    const m = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`${m}\n`);
+    process.exit(1);
+  }
+  process.stderr.write(`Probing ${config.baseUrl} (model: ${config.model})...\n`);
+  const result = await probeLlmConnection(config);
+  if (result.ok) {
+    process.stdout.write(`✓ ${result.message}\n`);
+    process.exit(0);
+  }
+  process.stderr.write(`✗ ${result.message}\n`);
+  process.exit(1);
+}
+
 async function main(): Promise<void> {
+  const argv = process.argv.slice(2);
+  if (argv[0] === "check-llm" || argv[0] === "llm-check") {
+    await runCheckLlmCommand();
+    return;
+  }
+
   const args = parseCliArgs();
   if (args === "help") { printHelp(); process.exit(0); }
   if (args === "version") {

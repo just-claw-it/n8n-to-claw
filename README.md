@@ -78,6 +78,9 @@ n8n-to-claw convert workflow.json --force
 
 # Print CLI version
 n8n-to-claw --version
+
+# Verify LLM_* and that the OpenAI-compatible endpoint is reachable (use before convert, especially local Ollama)
+n8n-to-claw check-llm
 ```
 
 **Debug logging:**
@@ -101,9 +104,12 @@ Optional:
 |---|---|---|
 | `LLM_TIMEOUT_MS` | `60000` | Per-request LLM timeout in milliseconds |
 | `LLM_MAX_RETRIES` | `3` | Max retries on 429 rate-limit or 5xx errors |
+| `LLM_MAX_TOKENS` | `4096` | Max completion tokens per request; lower values can finish sooner on slow local models (Ollama) but may truncate output |
 | `DEBUG` | — | Set to `n8n-to-claw` to enable structured debug logging |
 
 Copy [`.env.example`](.env.example) to `.env`, fill in values, then `source .env` (or export the variables in your shell).
+
+After setting `LLM_*`, run `n8n-to-claw check-llm` to confirm connectivity. That uses the same env as `convert` and fails fast with hints if the URL is wrong, Ollama is not running, or a remote agent cannot reach your machine’s `localhost`.
 
 Example (OpenAI):
 ```bash
@@ -117,6 +123,17 @@ Example ([Groq / GroqCloud](https://console.groq.com/docs/models) — not xAI Gr
 export LLM_BASE_URL=https://api.groq.com/openai/v1
 export LLM_API_KEY=gsk_...
 export LLM_MODEL=llama-3.3-70b-versatile
+```
+
+Example (local **Ollama** — transpile sends a **large** system prompt + workflow; an 8B CPU model can take many minutes per attempt. `ollama run "ping"` is not comparable workload.)
+
+```bash
+export LLM_BASE_URL=http://127.0.0.1:11434/v1
+export LLM_API_KEY=ollama
+export LLM_MODEL=llama3.1:8b
+export LLM_TIMEOUT_MS=900000
+# Optional: cap output length to reduce generation time (may truncate; retry may still help)
+# export LLM_MAX_TOKENS=2048
 ```
 
 ## Output
@@ -332,6 +349,14 @@ The transpile-quality baseline path is
 `src/evals/transpile-quality-eval.test.ts` enforces parity only when
 `report.tscAvailable` matches the baseline (so machines without `tsc` on PATH do
 not fail the snapshot).
+
+**Golden transpile snapshots:** `test-fixtures/golden-transpile/<fixture-stem>/`
+holds expected `SKILL.md` + `skill.ts` for each workflow JSON in `test-fixtures/`.
+`src/evals/golden-transpile.test.ts` mocks the LLM to return those files and
+asserts `transpile()` output matches (regression guard for the output parser and
+pipeline). The integration test loads the same files for the notify-slack
+end-to-end case. Update the golden files when you intentionally change expected
+mock output, then run `npm test`.
 
 Or run `./scripts/setup.sh` from the repo root to install, typecheck, test, and build in one go.
 
