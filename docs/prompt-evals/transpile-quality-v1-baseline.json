@@ -1,18 +1,18 @@
 {
   "promptVersion": "v1",
-  "tscAvailable": false,
+  "tscAvailable": true,
   "scenarioCount": 4,
   "scenarios": [
     {
       "scenario": "valid_first_try",
-      "fixtureCount": 5,
-      "parseSuccessCount": 5,
+      "fixtureCount": 6,
+      "parseSuccessCount": 6,
       "usedRetryCount": 0,
       "retryRescuedCount": 0,
       "outcomes": {
-        "success": 0,
+        "success": 6,
         "draft": 0,
-        "validation_skip": 5,
+        "validation_skip": 0,
         "parse_error": 0
       },
       "fixtures": [
@@ -22,7 +22,7 @@
           "parseSuccess": true,
           "usedRetry": false,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "success"
         },
         {
           "fixture": "daily-hacker-news-digest.json",
@@ -30,7 +30,7 @@
           "parseSuccess": true,
           "usedRetry": false,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "success"
         },
         {
           "fixture": "github-webhook-to-slack.json",
@@ -38,7 +38,7 @@
           "parseSuccess": true,
           "usedRetry": false,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "success"
         },
         {
           "fixture": "notify-slack-on-postgres.json",
@@ -46,7 +46,15 @@
           "parseSuccess": true,
           "usedRetry": false,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "success"
+        },
+        {
+          "fixture": "schedule-http-ping.json",
+          "scenario": "valid_first_try",
+          "parseSuccess": true,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "success"
         },
         {
           "fixture": "sync-crm-with-custom-nodes.json",
@@ -54,20 +62,20 @@
           "parseSuccess": true,
           "usedRetry": false,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "success"
         }
       ]
     },
     {
       "scenario": "fixed_on_retry",
-      "fixtureCount": 5,
-      "parseSuccessCount": 5,
-      "usedRetryCount": 0,
-      "retryRescuedCount": 0,
+      "fixtureCount": 6,
+      "parseSuccessCount": 6,
+      "usedRetryCount": 6,
+      "retryRescuedCount": 6,
       "outcomes": {
-        "success": 0,
+        "success": 6,
         "draft": 0,
-        "validation_skip": 5,
+        "validation_skip": 0,
         "parse_error": 0
       },
       "fixtures": [
@@ -75,54 +83,62 @@
           "fixture": "ai-support-chatbot.json",
           "scenario": "fixed_on_retry",
           "parseSuccess": true,
-          "usedRetry": false,
-          "retryRescued": false,
-          "outcome": "validation_skip"
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
         },
         {
           "fixture": "daily-hacker-news-digest.json",
           "scenario": "fixed_on_retry",
           "parseSuccess": true,
-          "usedRetry": false,
-          "retryRescued": false,
-          "outcome": "validation_skip"
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
         },
         {
           "fixture": "github-webhook-to-slack.json",
           "scenario": "fixed_on_retry",
           "parseSuccess": true,
-          "usedRetry": false,
-          "retryRescued": false,
-          "outcome": "validation_skip"
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
         },
         {
           "fixture": "notify-slack-on-postgres.json",
           "scenario": "fixed_on_retry",
           "parseSuccess": true,
-          "usedRetry": false,
-          "retryRescued": false,
-          "outcome": "validation_skip"
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
+        },
+        {
+          "fixture": "schedule-http-ping.json",
+          "scenario": "fixed_on_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
         },
         {
           "fixture": "sync-crm-with-custom-nodes.json",
           "scenario": "fixed_on_retry",
           "parseSuccess": true,
-          "usedRetry": false,
-          "retryRescued": false,
-          "outcome": "validation_skip"
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
         }
       ]
     },
     {
       "scenario": "still_broken_after_retry",
-      "fixtureCount": 5,
-      "parseSuccessCount": 5,
-      "usedRetryCount": 0,
+      "fixtureCount": 6,
+      "parseSuccessCount": 6,
+      "usedRetryCount": 6,
       "retryRescuedCount": 0,
       "outcomes": {
         "success": 0,
-        "draft": 0,
-        "validation_skip": 5,
+        "draft": 6,
+        "validation_skip": 0,
         "parse_error": 0
       },
       "fixtures": [
@@ -130,47 +146,55 @@
           "fixture": "ai-support-chatbot.json",
           "scenario": "still_broken_after_retry",
           "parseSuccess": true,
-          "usedRetry": false,
+          "usedRetry": true,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "draft"
         },
         {
           "fixture": "daily-hacker-news-digest.json",
           "scenario": "still_broken_after_retry",
           "parseSuccess": true,
-          "usedRetry": false,
+          "usedRetry": true,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "draft"
         },
         {
           "fixture": "github-webhook-to-slack.json",
           "scenario": "still_broken_after_retry",
           "parseSuccess": true,
-          "usedRetry": false,
+          "usedRetry": true,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "draft"
         },
         {
           "fixture": "notify-slack-on-postgres.json",
           "scenario": "still_broken_after_retry",
           "parseSuccess": true,
-          "usedRetry": false,
+          "usedRetry": true,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "draft"
+        },
+        {
+          "fixture": "schedule-http-ping.json",
+          "scenario": "still_broken_after_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": false,
+          "outcome": "draft"
         },
         {
           "fixture": "sync-crm-with-custom-nodes.json",
           "scenario": "still_broken_after_retry",
           "parseSuccess": true,
-          "usedRetry": false,
+          "usedRetry": true,
           "retryRescued": false,
-          "outcome": "validation_skip"
+          "outcome": "draft"
         }
       ]
     },
     {
       "scenario": "unparseable_first_try",
-      "fixtureCount": 5,
+      "fixtureCount": 6,
       "parseSuccessCount": 0,
       "usedRetryCount": 0,
       "retryRescuedCount": 0,
@@ -178,7 +202,7 @@
         "success": 0,
         "draft": 0,
         "validation_skip": 0,
-        "parse_error": 5
+        "parse_error": 6
       },
       "fixtures": [
         {
@@ -207,6 +231,14 @@
         },
         {
           "fixture": "notify-slack-on-postgres.json",
+          "scenario": "unparseable_first_try",
+          "parseSuccess": false,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "parse_error"
+        },
+        {
+          "fixture": "schedule-http-ping.json",
           "scenario": "unparseable_first_try",
           "parseSuccess": false,
           "usedRetry": false,

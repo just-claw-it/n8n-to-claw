@@ -157,6 +157,32 @@ describe("Full pipeline integration (mocked LLM)", () => {
     expect(warnings.length).toBeGreaterThan(0);
   }, 30_000);
 
+  it("linear schedule → HTTP GET chain uses deterministic template without callLLM", async () => {
+    const spy = vi.spyOn(llmModule, "callLLM");
+    vi.spyOn(llmModule, "loadLLMConfig").mockReturnValue({
+      baseUrl: "http://mock",
+      timeoutMs: 30000,
+      maxRetries: 1,
+      apiKey: "mock-key",
+      model: "mock-model",
+    });
+
+    const raw = await loadFromFile("test-fixtures/schedule-http-ping.json");
+    const ir = parse(raw);
+    const result = await transpile(ir);
+
+    expect(spy).not.toHaveBeenCalled();
+    expect(result.transpileWarnings.some((w) => w.reason === "deterministic_transpile")).toBe(
+      true
+    );
+    expect(result.output.skillTs).toContain("fetch(url, { method:");
+    if (await hasTscAvailable()) {
+      expect(result.status).toBe("success");
+    } else {
+      expect(result.status).toBe("validation_skip");
+    }
+  }, 30_000);
+
   it("status is success when mock LLM returns valid TypeScript", async () => {
     vi.spyOn(llmModule, "callLLM").mockResolvedValue({ content: NOTIFY_GOLDEN_LLM_RESPONSE });
     vi.spyOn(llmModule, "loadLLMConfig").mockReturnValue({

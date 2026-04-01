@@ -1,0 +1,52 @@
+{
+  "id": "wf-deterministic-ping",
+  "name": "Schedule HTTP Ping",
+  "nodes": [
+    {
+      "id": "a1000001-0001-0001-0001-000000000001",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 * * * *" }]
+        }
+      }
+    },
+    {
+      "id": "a1000002-0002-0002-0002-000000000002",
+      "name": "Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [300, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://example.com/api/health",
+        "options": { "timeout": 10000 }
+      }
+    },
+    {
+      "id": "a1000003-0003-0003-0003-000000000003",
+      "name": "Second Ping",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://example.org/status",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [[{ "node": "Health Check", "type": "main", "index": 0 }]]
+    },
+    "Health Check": {
+      "main": [[{ "node": "Second Ping", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

@@ -106,6 +106,7 @@ Optional:
 | `LLM_MAX_RETRIES` | `3` | Max retries on 429 rate-limit or 5xx errors |
 | `LLM_MAX_TOKENS` | `4096` | Max completion tokens per request; lower values can finish sooner on slow local models (Ollama) but may truncate output |
 | `DEBUG` | — | Set to `n8n-to-claw` to enable structured debug logging |
+| `N8N_TO_CLAW_FORCE_LLM` | — | If `1`, skip deterministic templates and always call the LLM |
 
 Copy [`.env.example`](.env.example) to `.env`, fill in values, then `source .env` (or export the variables in your shell).
 

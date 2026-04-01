@@ -29,3 +29,6 @@ coverage/
 
 # Local-only notes (roadmap, scratch) — not committed
 *.local.md
+
+# Windows: copy scripts/local-env.example.ps1 → scripts/local-env.ps1 (prepend Node to PATH)
+scripts/local-env.ps1

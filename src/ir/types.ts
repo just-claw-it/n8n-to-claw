@@ -108,7 +108,8 @@ export type IRWarningReason =
   | "expression_present"      // n8n expression found → runtime resolution needed
   | "unsupported_parameter"   // parameter shape not understood by parser
   | "dangling_edge"           // connection references a node not in the node list
-  | "transpile_validation";   // transpile-phase validation issue (tsc failure/skip)
+  | "transpile_validation"   // transpile-phase validation issue (tsc failure/skip)
+  | "deterministic_transpile"; // output from non-LLM template (linear HTTP GET chain)
 
 // ---------------------------------------------------------------------------
 // Top-level IR — output of the parse stage, input to the transpile stage.

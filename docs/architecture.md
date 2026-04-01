@@ -12,6 +12,7 @@ Input
                                              │
                                              ▼
                                     src/transpile/transpile.ts
+                                    ├── deterministic/linear-http-chain.ts (template, no LLM)
                                     ├── prompt.ts   (IR → LLM messages)
                                     ├── llm.ts      (API call)
                                     ├── output-parser.ts (extract blocks)
@@ -43,6 +44,12 @@ an exact lookup table and a prefix-based fallback. The category determines:
 - Which warning reason is emitted
 - How the LLM prompt flags the node (`UNKNOWN_NODE`, `DATABASE_NODE`, etc.)
 - Which graceful-degradation strategy the LLM is prompted to apply
+
+## Deterministic transpilation
+
+If the workflow is a linear `main` path — an allowed schedule / manual / cron / interval / start trigger, then only HTTP Request nodes, each `GET` with a static URL, no `={{…}}` expressions, no credentials, no disabled nodes — `transpile()` emits `SKILL.md` and `skill.ts` from the template in `src/transpile/deterministic/linear-http-chain.ts` and validates with `tsc` **without calling the LLM**. A `transpileWarnings` entry with reason `deterministic_transpile` is added.
+
+To always use the LLM (e.g. tests), set env `N8N_TO_CLAW_FORCE_LLM=1` or pass `{ forceLlm: true }` as the second argument to `transpile()` (see `TranspileOptions` in `transpile.ts`).
 
 ## LLM validation loop
 

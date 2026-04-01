@@ -340,8 +340,7 @@ async function main(): Promise<void> {
   }
 
   // ── Stage 2: Transpile ─────────────────────────────────────────────────
-  step("Transpiling via LLM...");
-  indent(`Model: ${process.env["LLM_MODEL"] ?? "(LLM_MODEL not set)"}`);
+  step("Transpiling...");
 
   let transpileResult: Awaited<ReturnType<typeof transpile>>;
   try {
@@ -351,6 +350,15 @@ async function main(): Promise<void> {
       fatalError("Transpile failed", err);
     }
     throw err;
+  }
+
+  const usedDeterministic = transpileResult.transpileWarnings.some(
+    (w) => w.reason === "deterministic_transpile"
+  );
+  if (usedDeterministic) {
+    indent("Path: deterministic template (no LLM).");
+  } else {
+    indent(`Model: ${process.env["LLM_MODEL"] ?? "(LLM_MODEL not set)"}`);
   }
 
   const statusMsg = {

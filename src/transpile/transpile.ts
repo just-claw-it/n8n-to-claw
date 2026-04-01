@@ -3,6 +3,62 @@ import { callLLM, loadLLMConfig, type LLMConfig, type LLMMessage } from "./llm.j
 import { buildTranspilePrompt, buildRetryPrompt } from "./prompt.js";
 import { parseLLMOutput, type TranspileOutput, ParseOutputError } from "./output-parser.js";
 import { validateTypeScript } from "./validate.js";
+import { tryDeterministicLinearHttpGet } from "./deterministic/linear-http-chain.js";
+
+/** Optional second argument to `transpile()`, or pass a bare `LLMConfig` (web API). */
+export interface TranspileOptions {
+  llmConfig?: LLMConfig;
+  /** Skip deterministic fast path; always call the LLM. */
+  forceLlm?: boolean;
+}
+
+function isLLMConfigShape(x: unknown): x is LLMConfig {
+  if (typeof x !== "object" || x === null) return false;
+  const o = x as Record<string, unknown>;
+  return (
+    typeof o["baseUrl"] === "string" &&
+    typeof o["apiKey"] === "string" &&
+    typeof o["model"] === "string"
+  );
+}
+
+function resolveTranspileInput(
+  second?: LLMConfig | TranspileOptions
+): { llmConfig?: LLMConfig; forceLlm: boolean } {
+  let forceLlm = process.env["N8N_TO_CLAW_FORCE_LLM"] === "1";
+  if (second === undefined) {
+    return { forceLlm };
+  }
+  if (isLLMConfigShape(second)) {
+    return { llmConfig: second, forceLlm };
+  }
+  const o = second as TranspileOptions;
+  if (o.forceLlm === true) forceLlm = true;
+  if (o.llmConfig !== undefined) {
+    return { llmConfig: o.llmConfig, forceLlm };
+  }
+  return { forceLlm };
+}
+
+function deterministicTranspileWarning(ir: WorkflowIR): IRWarning {
+  return {
+    nodeId: "deterministic",
+    nodeName: ir.displayName,
+    nodeType: "n8n-to-claw.deterministic",
+    reason: "deterministic_transpile",
+    detail:
+      "Skill generated with deterministic linear HTTP GET template (no LLM call).",
+  };
+}
+
+function isValidationSkippedError(error: string | undefined): boolean {
+  if (error === undefined) return false;
+  return (
+    error.includes("tsc not found") ||
+    error.includes("Could not resolve the `typescript`") ||
+    error.includes("Skipping validation")
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Result types
@@ -38,10 +94,43 @@ export class TranspileError extends Error {
 
 export async function transpile(
   ir: WorkflowIR,
-  config?: LLMConfig
+  second?: LLMConfig | TranspileOptions
 ): Promise<TranspileResult> {
-  const llmConfig = config ?? loadLLMConfig();
+  const { llmConfig: injectedLlmConfig, forceLlm } = resolveTranspileInput(second);
   const transpileWarnings: IRWarning[] = [];
+
+  if (!forceLlm) {
+    const det = tryDeterministicLinearHttpGet(ir);
+    if (det !== null) {
+      const detValidation = await validateTypeScript(det.skillTs);
+      if (detValidation.valid) {
+        transpileWarnings.push(deterministicTranspileWarning(ir));
+        return {
+          status: "success",
+          output: det,
+          transpileWarnings,
+        };
+      }
+      if (isValidationSkippedError(detValidation.error)) {
+        transpileWarnings.push({
+          nodeId: "transpile",
+          nodeName: "transpile",
+          nodeType: "transpile",
+          reason: "transpile_validation",
+          detail: "TypeScript validation skipped: tsc not available.",
+        });
+        transpileWarnings.push(deterministicTranspileWarning(ir));
+        return {
+          status: "validation_skip",
+          output: det,
+          transpileWarnings,
+        };
+      }
+      // Template failed tsc — unusual; fall through to LLM.
+    }
+  }
+
+  const llmConfig = injectedLlmConfig ?? loadLLMConfig();
 
   // ---- Attempt 1 ----
   const messages = buildTranspilePrompt(ir);

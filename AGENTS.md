@@ -7,7 +7,9 @@ agents to understand the codebase before working on it.
 
 `n8n-to-claw` is a CLI tool that converts [n8n](https://n8n.io) workflow JSON
 into [OpenClaw](https://openclaw.ai)-compatible skills (`SKILL.md` + `skill.ts`).
-An LLM handles the transpilation step via any OpenAI-compatible API.
+Transpilation is usually an LLM call; **deterministic templates** handle some
+linear “schedule/manual → HTTP GET” workflows without the LLM (see
+`src/transpile/deterministic/linear-http-chain.ts`).
 
 ## Architecture — three-stage pipeline
 
@@ -15,10 +17,10 @@ An LLM handles the transpilation step via any OpenAI-compatible API.
 Input (file or n8n API)
        │
        ▼
-┌─────────────┐     ┌────────────────────┐     ┌───────────┐
-│  Parse      │────▶│  Transpile (LLM)   │────▶│  Package  │
-│  IR types   │     │  prompt → validate │     │  write    │
-└─────────────┘     └────────────────────┘     └───────────┘
+┌─────────────┐     ┌────────────────────────────┐     ┌───────────┐
+│  Parse      │────▶│  Transpile (template|LLM)  │────▶│  Package  │
+│  IR types   │     │  validate skill.ts (tsc) │     │  write    │
+└─────────────┘     └────────────────────────────┘     └───────────┘
 ```
 
 ## Source layout
@@ -41,7 +43,9 @@ src/
     prompt.ts              — Build LLM messages from WorkflowIR (includes few-shot example)
     output-parser.ts       — Extract SKILL.md + skill.ts from LLM response
     validate.ts            — Run tsc --noEmit on generated skill.ts
-    transpile.ts           — Orchestrate: LLM → validate → retry → draft fallback
+    deterministic/
+      linear-http-chain.ts — Template path: linear trigger + HTTP GET chain (no LLM)
+    transpile.ts           — Template first, else LLM → validate → retry → draft fallback
     *.test.ts
   utils/
     logger.ts              — DEBUG=n8n-to-claw structured logging; zero cost when disabled
@@ -102,7 +106,7 @@ scripts/
 
 4. **The parse stage never calls the LLM.** The transpile stage never reads
    from disk. The package stage never calls the LLM or the n8n API. Stages
-   are strictly separated.
+   are strictly separated. The deterministic template path does not call the LLM.
 
 5. **`tsc --noEmit` must pass at all times.** The tsconfig uses
    `exactOptionalPropertyTypes: true` and `noUncheckedIndexedAccess: true` —
@@ -124,6 +128,8 @@ npm run typecheck     # tsc --noEmit
 npm run build         # compile to dist/
 node dist/cli/index.js --help
 ```
+
+**Windows (PowerShell):** If `npm` / `node` are not on `PATH` (common in agent shells), copy `scripts/local-env.example.ps1` to `scripts/local-env.ps1` (gitignored), then in that session run `. .\scripts\local-env.ps1` before the commands above. Default install dir: `C:\Program Files\nodejs`.
 
 ## Environment variables
 

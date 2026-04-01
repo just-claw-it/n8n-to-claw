@@ -1,15 +1,15 @@
 {
   "promptVersion": "v1",
-  "fixtureCount": 5,
+  "fixtureCount": 6,
   "totals": {
-    "nodes": 27,
-    "edges": 22,
+    "nodes": 30,
+    "edges": 24,
     "warnings": 26,
     "unknownNodes": 1,
     "expressionNodes": 13,
     "credentialRefs": 8,
-    "promptChars": 44573,
-    "estimatedTokens": 11145
+    "promptChars": 51296,
+    "estimatedTokens": 12826
   },
   "fixtures": [
     {
@@ -63,6 +63,19 @@
       "credentialRefCount": 2,
       "promptChars": 9010,
       "estimatedTokens": 2253
+    },
+    {
+      "fixture": "schedule-http-ping.json",
+      "workflowName": "Schedule HTTP Ping",
+      "triggerType": "schedule",
+      "nodeCount": 3,
+      "edgeCount": 2,
+      "warningCount": 0,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 0,
+      "credentialRefCount": 0,
+      "promptChars": 6723,
+      "estimatedTokens": 1681
     },
     {
       "fixture": "sync-crm-with-custom-nodes.json",
