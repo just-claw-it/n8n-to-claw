@@ -14,6 +14,7 @@ Full field-by-field reference for the intermediate representation defined in
 | `edges` | `IREdge[]` | Normalized connections |
 | `credentialRefs` | `CredentialRef[]` | Deduplicated credential references across all nodes |
 | `warnings` | `IRWarning[]` | All parse-time degradation warnings |
+| `quality` | `IRQuality` | Parse-time readiness/confidence score and summary |
 | `raw` | `unknown` | Original workflow JSON — never mutated |
 
 ## TriggerType
@@ -90,3 +91,12 @@ Derived from the trigger node type. Drives the OpenClaw skill metadata.
 | `"dangling_edge"` | Connection references a node not in the node list |
 | `"transpile_validation"` | Transpile-phase validation issue (tsc failure/skip) |
 | `"deterministic_transpile"` | Output from non-LLM deterministic template (e.g. linear HTTP GET chain) |
+
+## IRQuality
+
+| Field | Type | Description |
+|---|---|---|
+| `score` | `number` | 0..100 readiness score derived from warning signals |
+| `level` | `"high" \| "medium" \| "low"` | Coarse confidence label for UI/CLI |
+| `highRiskWarningCount` | `number` | Count of high-risk warnings (unknown node, dangling edge, etc.) |
+| `summary` | `string` | Human-readable review guidance |

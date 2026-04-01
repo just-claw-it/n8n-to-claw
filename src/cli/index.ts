@@ -317,8 +317,10 @@ async function main(): Promise<void> {
 
   indent(`Workflow: "${ir.displayName}"`);
   indent(`Trigger:  ${ir.triggerType}`);
+  indent(`Confidence: ${ir.quality.score}/100 (${ir.quality.level})`);
   indent(`Nodes:    ${ir.nodes.length} (${summarizeCategories(ir)})`);
   indent(`Edges:    ${ir.edges.length}`);
+  indent(`Readiness: ${ir.quality.summary}`);
 
   if (ir.warnings.length > 0) {
     indent(`Warnings: ${ir.warnings.length}`);

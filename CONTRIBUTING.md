@@ -23,7 +23,7 @@ The **CLI** lives at the repo root. The optional **web UI** is in `web/` (see [R
 - **Bug reports** with a minimal n8n workflow JSON that reproduces the issue (credentials scrubbed).
 - **Prompt improvements** — if a node type consistently produces broken `skill.ts`, open a PR with changes in `src/transpile/prompt.ts` and a before/after example.
 - **Test fixtures** — real-world workflow JSONs (no secrets) in `test-fixtures/`.
-- **Web UI** — changes in `web/`; run `cd web && npm install && npm run dev`.
+- **Web UI** — changes in `web/`; run `cd web && npm install && npm run dev` (bash/cmd). On **Windows PowerShell 5.x**, use semicolons: `cd web; npm install; npm run dev`.
 
 ## Adding a new node type
 
@@ -56,7 +56,7 @@ Changes to `src/ir/types.ts` are high-impact. Before proposing one:
 
 - [ ] `npm test` passes (full suite)
 - [ ] `npm run typecheck` passes
-- [ ] If you changed the web UI: `cd web && npm run typecheck && npm run build`
+- [ ] If you changed the web UI: `cd web && npm run typecheck && npm run build` (PowerShell 5: `cd web; npm run typecheck; npm run build`)
 - [ ] If you changed Docker files: `docker build -t n8n-to-claw:local .` (from repo root)
 - [ ] New node types or behavior documented in `README.md` / `CHANGELOG.md` as appropriate
 - [ ] `CHANGELOG.md` has an entry under `[Unreleased]` when the change is user-visible

@@ -243,6 +243,8 @@ npm install
 npm run dev       # Vite dev server + Express API (see terminal for URLs)
 ```
 
+On **Windows PowerShell 5.x**, chain commands with `;` instead of `&&` (or use **PowerShell 7+**, or **cmd.exe**).
+
 In development, open the Vite URL (typically **http://localhost:5173**). The Express API listens on port **3847** by default.
 
 You can:

@@ -55,11 +55,19 @@ export function ParseResults({ result, onTranspile, onReset }: ParseResultsProps
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <SummaryCard label="Trigger" value={TRIGGER_LABELS[result.triggerType] ?? result.triggerType} />
+        <SummaryCard label="Confidence" value={`${result.quality.score}/100`} />
         <SummaryCard label="Nodes" value={String(result.nodes.length)} />
         <SummaryCard label="Edges" value={String(result.edges.length)} />
         <SummaryCard label="Warnings" value={String(result.warnings.length)} />
+      </div>
+      <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-4">
+        <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Readiness</div>
+        <div className="text-sm">
+          <span className="font-semibold text-zinc-100">{result.quality.level}</span>
+          <span className="text-zinc-400"> — {result.quality.summary}</span>
+        </div>
       </div>
 
       {/* Node table */}

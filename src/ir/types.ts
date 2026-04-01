@@ -100,6 +100,17 @@ export interface IRWarning {
   detail: string;
 }
 
+export interface IRQuality {
+  /** 0..100 readiness score (higher = less manual review likely). */
+  score: number;
+  /** Coarse confidence label for CLI/web display. */
+  level: "high" | "medium" | "low";
+  /** Number of parse warnings considered high-risk. */
+  highRiskWarningCount: number;
+  /** Human-readable guidance from parse risk signals. */
+  summary: string;
+}
+
 export type IRWarningReason =
   | "unknown_node_type"       // no category mapping found → stub emitted
   | "credential_reference"    // credentials detected → credentials.example.env needed
@@ -129,6 +140,7 @@ export interface WorkflowIR {
    */
   credentialRefs: CredentialRef[];
   warnings: IRWarning[];
+  quality: IRQuality;
   /** Original workflow JSON — preserved verbatim for debugging */
   raw: unknown;
 }

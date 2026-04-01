@@ -56,6 +56,8 @@ describe("parse()", () => {
     expect(ir.name).toBe("my-test-workflow"); // kebab-case
     expect(ir.nodes).toHaveLength(2);
     expect(ir.edges).toHaveLength(1);
+    expect(ir.quality.level).toBe("high");
+    expect(ir.quality.score).toBeGreaterThanOrEqual(90);
   });
 
   it("correctly sets trigger type", () => {
@@ -105,6 +107,7 @@ describe("parse()", () => {
     const w = ir.warnings.find((w) => w.reason === "unknown_node_type");
     expect(w).toBeDefined();
     expect(w?.nodeType).toBe("n8n-nodes-community.unknownService");
+    expect(ir.quality.level).toBe("medium");
   });
 
   it("detects expressions in parameters", () => {

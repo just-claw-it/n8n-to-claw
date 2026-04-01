@@ -19,6 +19,12 @@ const BASE_IR: WorkflowIR = {
   edges: [],
   credentialRefs: [],
   warnings: [],
+  quality: {
+    score: 100,
+    level: "high",
+    highRiskWarningCount: 0,
+    summary: "Likely production-ready after standard credential setup.",
+  },
   raw: {},
 };
 

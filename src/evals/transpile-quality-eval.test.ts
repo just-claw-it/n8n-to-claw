@@ -1,17 +1,24 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { access, readFile } from "node:fs/promises";
-import { buildTranspileQualityEvalReport } from "./transpile-quality-eval.js";
+import {
+  buildTranspileQualityEvalReport,
+  type TranspileQualityEvalReport,
+} from "./transpile-quality-eval.js";
 
 describe("transpile quality eval report", () => {
-  it("returns a scenario report for each deterministic quality scenario", async () => {
-    const report = await buildTranspileQualityEvalReport("test-fixtures");
+  let report: TranspileQualityEvalReport;
+
+  beforeAll(async () => {
+    report = await buildTranspileQualityEvalReport("test-fixtures");
+  }, 300_000);
+
+  it("returns a scenario report for each deterministic quality scenario", () => {
     expect(report.promptVersion).toBe("v1");
     expect(report.scenarioCount).toBe(report.scenarios.length);
     expect(report.scenarioCount).toBeGreaterThan(0);
-  }, 60_000);
+  });
 
-  it("has per-scenario totals that match fixture-level rows", async () => {
-    const report = await buildTranspileQualityEvalReport("test-fixtures");
+  it("has per-scenario totals that match fixture-level rows", () => {
     for (const scenario of report.scenarios) {
       expect(scenario.fixtureCount).toBe(scenario.fixtures.length);
 
@@ -36,16 +43,15 @@ describe("transpile quality eval report", () => {
       expect(scenario.retryRescuedCount).toBe(recomputed.retryRescuedCount);
       expect(scenario.outcomes).toEqual(recomputed.outcomes);
     }
-  }, 60_000);
+  });
 
-  it("unparseable_first_try scenario always records parse_error", async () => {
-    const report = await buildTranspileQualityEvalReport("test-fixtures");
+  it("unparseable_first_try scenario always records parse_error", () => {
     const unparseable = report.scenarios.find((s) => s.scenario === "unparseable_first_try");
     expect(unparseable).toBeDefined();
     expect(unparseable?.parseSuccessCount).toBe(0);
     expect(unparseable?.usedRetryCount).toBe(0);
     expect(unparseable?.outcomes.parse_error).toBe(unparseable?.fixtureCount);
-  }, 60_000);
+  });
 
   it("matches baseline when committed and tsc availability matches", async () => {
     const baselinePath = "docs/prompt-evals/transpile-quality-v1-baseline.json";
@@ -55,7 +61,6 @@ describe("transpile quality eval report", () => {
       return;
     }
 
-    const report = await buildTranspileQualityEvalReport("test-fixtures");
     const baselineRaw = await readFile(baselinePath, "utf-8");
     const baseline = JSON.parse(baselineRaw) as { tscAvailable?: boolean };
 
@@ -64,5 +69,5 @@ describe("transpile quality eval report", () => {
     }
 
     expect(report).toEqual(baseline);
-  }, 60_000);
+  });
 });

@@ -35,6 +35,7 @@ src/
     categorize.test.ts
     parser.ts              — parse() function, ParseError
     parser.test.ts
+    quality.ts             — IR readiness score (IRQuality) from parse warnings
   adapters/
     file.ts                — Load raw JSON from a local file
     api.ts                 — Load raw JSON from the n8n REST API

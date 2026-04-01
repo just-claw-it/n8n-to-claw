@@ -47,6 +47,7 @@ async function createApp() {
         name: ir.name,
         displayName: ir.displayName,
         triggerType: ir.triggerType,
+        quality: ir.quality,
         nodes: ir.nodes.map((n: {
           id: string; name: string; type: string; category: string;
           disabled: boolean; hasExpressions: boolean; credentials: { type: string; name: string }[];

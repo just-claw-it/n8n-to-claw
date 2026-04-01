@@ -7,6 +7,7 @@ import type {
 } from "../ir/types.js";
 import type { N8nWorkflowJson, N8nRawNode } from "./n8n-schema.js";
 import { categorizeNode, deriveTriggerType } from "./categorize.js";
+import { assessIRQuality } from "./quality.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -252,6 +253,7 @@ export function parse(raw: unknown): WorkflowIR {
 
   // Derive trigger type from nodes
   const triggerType = deriveTriggerType(nodes);
+  const quality = assessIRQuality(warnings, triggerType);
 
   // Collect all credential refs (deduplicated)
   const credentialRefs = dedupeCredentials(nodes.flatMap((n) => n.credentials));
@@ -264,6 +266,7 @@ export function parse(raw: unknown): WorkflowIR {
     edges,
     credentialRefs,
     warnings,
+    quality,
     raw,
   };
 }

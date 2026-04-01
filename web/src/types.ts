@@ -27,10 +27,18 @@ export interface CredentialSummary {
   name: string;
 }
 
+export interface ParseQualitySummary {
+  score: number;
+  level: "high" | "medium" | "low";
+  highRiskWarningCount: number;
+  summary: string;
+}
+
 export interface ParseResponse {
   name: string;
   displayName: string;
   triggerType: string;
+  quality: ParseQualitySummary;
   nodes: NodeSummary[];
   edges: EdgeSummary[];
   credentials: CredentialSummary[];
