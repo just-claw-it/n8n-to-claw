@@ -53,6 +53,8 @@ src/
   package/
     package.ts             — Write output to ~/.openclaw/workspace/skills/<name>/
     package.test.ts
+  coverage/
+    node-coverage.ts       — Scan test-fixtures → mapping stats; `npm run coverage:nodes`
   cli/
     index.ts               — CLI entry point (parseArgs, orchestrates all stages)
   integration.test.ts      — Full pipeline tests with mocked LLM
@@ -156,6 +158,8 @@ LLM_MAX_TOKENS — optional; default 4096; lower can speed local models (truncat
   transpile output matches those files
 - `src/transpile/validate.test.ts` invokes real `tsc` against known-good and
   known-bad TypeScript snippets
+- `src/coverage/node-coverage.test.ts` exercises the fixture scan + markdown
+  generator for `docs/node-coverage.md` (`npm run coverage:nodes`)
 - GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, tests, CLI build,
   smoke `--help`, then `web/` install, typecheck, and Vite build; on Node 20 only,
   `docker build` verifies the `Dockerfile`

@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { categorizeNode, deriveTriggerType, knownNodeTypes } from "../parse/categorize.js";
+import {
+  categorizeNode,
+  categorizeNodeWithSource,
+  deriveTriggerType,
+  knownNodeTypes,
+} from "../parse/categorize.js";
 
 describe("categorizeNode()", () => {
   // Existing coverage
@@ -253,6 +258,35 @@ describe("deriveTriggerType()", () => {
       { type: "n8n-nodes-base.scheduleTrigger" },
       { type: "n8n-nodes-base.slackTrigger" },
     ])).toBe("schedule");
+  });
+});
+
+describe("categorizeNodeWithSource()", () => {
+  it("marks exact_map", () => {
+    expect(categorizeNodeWithSource("n8n-nodes-base.httpRequest")).toEqual({
+      category: "http",
+      mappingSource: "exact_map",
+    });
+  });
+
+  it("marks prefix_fallback when EXACT_MAP misses but PREFIX_MAP matches", () => {
+    const r = categorizeNodeWithSource("n8n-nodes-base.postgresBackup");
+    expect(r.category).toBe("database");
+    expect(r.mappingSource).toBe("prefix_fallback");
+  });
+
+  it("marks suffix_trigger for unlisted *Trigger types", () => {
+    expect(categorizeNodeWithSource("n8n-nodes-base.acmeCorpTrigger")).toEqual({
+      category: "trigger",
+      mappingSource: "suffix_trigger",
+    });
+  });
+
+  it("marks unknown for unmapped community types", () => {
+    expect(categorizeNodeWithSource("n8n-nodes-community.neverHeardOf")).toEqual({
+      category: "unknown",
+      mappingSource: "unknown",
+    });
   });
 });
 

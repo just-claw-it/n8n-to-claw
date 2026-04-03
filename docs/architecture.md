@@ -45,6 +45,8 @@ an exact lookup table and a prefix-based fallback. The category determines:
 - How the LLM prompt flags the node (`UNKNOWN_NODE`, `DATABASE_NODE`, etc.)
 - Which graceful-degradation strategy the LLM is prompted to apply
 
+`categorizeNodeWithSource()` records whether the match came from `EXACT_MAP`, `PREFIX_MAP`, the `*Trigger` suffix rule, or `unknown`. The generated **[node coverage dashboard](node-coverage.md)** (`npm run coverage:nodes`) lists every node type used in `test-fixtures/` and how it was resolved.
+
 ## Deterministic transpilation
 
 If the workflow is a linear `main` path — an allowed schedule / manual / cron / interval / start trigger, then only HTTP Request nodes, each `GET` with a static URL, no `={{…}}` expressions, no credentials, no disabled nodes — `transpile()` emits `SKILL.md` and `skill.ts` from the template in `src/transpile/deterministic/linear-http-chain.ts` and validates with `tsc` **without calling the LLM**. A `transpileWarnings` entry with reason `deterministic_transpile` is added.

@@ -191,6 +191,8 @@ All degraded nodes are listed in `warnings.json` with name, type, and reason.
 
 ## Node coverage
 
+A **[generated dashboard](docs/node-coverage.md)** lists every node type that appears in `test-fixtures/`, its resolved category, and whether it was mapped via `EXACT_MAP`, a prefix/suffix fallback, or `unknown`. Regenerate it with `npm run coverage:nodes` (requires a successful `npm run build`).
+
 **479 node types** are explicitly mapped (sourced from n8n v2.13 `packages/nodes-base/package.json` + `@n8n/n8n-nodes-langchain`). Run `n8n-to-claw convert <file> --inspect` to see the full list.
 
 Additionally, **suffix and prefix fallback rules** ensure that even unmapped nodes get reasonable defaults:

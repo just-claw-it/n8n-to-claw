@@ -566,19 +566,37 @@ const PREFIX_MAP: Array<[prefix: string, category: NodeCategory]> = [
 // Public API
 // ---------------------------------------------------------------------------
 
-export function categorizeNode(nodeType: string): NodeCategory {
-  if (EXACT_MAP[nodeType] !== undefined) return EXACT_MAP[nodeType];
+/** How `categorizeNode` resolved the category (for coverage / tooling). */
+export type NodeMappingSource =
+  | "exact_map"
+  | "prefix_fallback"
+  | "suffix_trigger"
+  | "unknown";
 
-  for (const [prefix, category] of PREFIX_MAP) {
-    if (nodeType.startsWith(prefix)) return category;
+export function categorizeNodeWithSource(nodeType: string): {
+  category: NodeCategory;
+  mappingSource: NodeMappingSource;
+} {
+  if (EXACT_MAP[nodeType] !== undefined) {
+    return { category: EXACT_MAP[nodeType]!, mappingSource: "exact_map" };
   }
 
-  // Suffix fallback: any node type ending in "Trigger" is a trigger,
-  // even if we haven't mapped it explicitly (future-proofing).
-  const shortName = nodeType.split(".").pop() ?? "";
-  if (shortName.endsWith("Trigger")) return "trigger";
+  for (const [prefix, category] of PREFIX_MAP) {
+    if (nodeType.startsWith(prefix)) {
+      return { category, mappingSource: "prefix_fallback" };
+    }
+  }
 
-  return "unknown";
+  const shortName = nodeType.split(".").pop() ?? "";
+  if (shortName.endsWith("Trigger")) {
+    return { category: "trigger", mappingSource: "suffix_trigger" };
+  }
+
+  return { category: "unknown", mappingSource: "unknown" };
+}
+
+export function categorizeNode(nodeType: string): NodeCategory {
+  return categorizeNodeWithSource(nodeType).category;
 }
 
 export function deriveTriggerType(nodes: Array<{ type: string }>): TriggerType {

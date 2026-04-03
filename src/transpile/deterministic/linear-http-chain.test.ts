@@ -17,18 +17,22 @@ describe("tryDeterministicLinearHttpGet()", () => {
     expect(out!.skillTs).toContain("example.com");
   });
 
-  it("produces TypeScript that passes tsc when available", async () => {
-    const raw = await loadFromFile("test-fixtures/schedule-http-ping.json");
-    const ir = parse(raw);
-    const out = tryDeterministicLinearHttpGet(ir);
-    expect(out).not.toBeNull();
-    const v = await validateTypeScript(out!.skillTs);
-    if (v.error?.includes("Could not resolve")) {
-      expect(v.valid).toBe(false);
-      return;
-    }
-    expect(v.valid).toBe(true);
-  });
+  it(
+    "produces TypeScript that passes tsc when available",
+    async () => {
+      const raw = await loadFromFile("test-fixtures/schedule-http-ping.json");
+      const ir = parse(raw);
+      const out = tryDeterministicLinearHttpGet(ir);
+      expect(out).not.toBeNull();
+      const v = await validateTypeScript(out!.skillTs);
+      if (v.error?.includes("Could not resolve")) {
+        expect(v.valid).toBe(false);
+        return;
+      }
+      expect(v.valid).toBe(true);
+    },
+    30_000,
+  );
 
   it("returns null for notify fixture (not a pure linear HTTP chain)", async () => {
     const raw = await loadFromFile("test-fixtures/notify-slack-on-postgres.json");
