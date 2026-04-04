@@ -20,7 +20,8 @@ Thumbs.db
 *.temp
 *~
 *.log
-coverage/
+# Test coverage reports (root only — do not use bare `coverage/` or it ignores src/coverage/)
+/coverage/
 
 # Editor
 .vscode/
