@@ -1,0 +1,74 @@
+{
+  "id": "wf-deterministic-webhook-if",
+  "name": "Webhook If HTTP Ping",
+  "nodes": [
+    {
+      "id": "i1000001-0001-0001-0001-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "filtered-ping",
+        "responseMode": "onReceived",
+        "responseCode": 200
+      },
+      "webhookId": "wh-if-01"
+    },
+    {
+      "id": "i1000002-0002-0002-0002-000000000002",
+      "name": "Kind Is Ping",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.kind }}",
+              "rightValue": "ping",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "i1000003-0003-0003-0003-000000000003",
+      "name": "Fetch Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [520, 220],
+      "parameters": {
+        "method": "GET",
+        "url": "https://example.com/api/health",
+        "options": {}
+      }
+    },
+    {
+      "id": "i1000004-0004-0004-0004-000000000004",
+      "name": "Skip Branch",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [520, 400],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Kind Is Ping", "type": "main", "index": 0 }]]
+    },
+    "Kind Is Ping": {
+      "main": [
+        [{ "node": "Fetch Status", "type": "main", "index": 0 }],
+        [{ "node": "Skip Branch", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

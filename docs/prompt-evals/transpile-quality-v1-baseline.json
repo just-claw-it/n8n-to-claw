@@ -5,12 +5,12 @@
   "scenarios": [
     {
       "scenario": "valid_first_try",
-      "fixtureCount": 6,
-      "parseSuccessCount": 6,
+      "fixtureCount": 9,
+      "parseSuccessCount": 9,
       "usedRetryCount": 0,
       "retryRescuedCount": 0,
       "outcomes": {
-        "success": 6,
+        "success": 9,
         "draft": 0,
         "validation_skip": 0,
         "parse_error": 0
@@ -57,7 +57,31 @@
           "outcome": "success"
         },
         {
+          "fixture": "schedule-noop-http-ping.json",
+          "scenario": "valid_first_try",
+          "parseSuccess": true,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "success"
+        },
+        {
           "fixture": "sync-crm-with-custom-nodes.json",
+          "scenario": "valid_first_try",
+          "parseSuccess": true,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "success"
+        },
+        {
+          "fixture": "webhook-http-ping.json",
+          "scenario": "valid_first_try",
+          "parseSuccess": true,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "success"
+        },
+        {
+          "fixture": "webhook-if-http-ping.json",
           "scenario": "valid_first_try",
           "parseSuccess": true,
           "usedRetry": false,
@@ -68,12 +92,12 @@
     },
     {
       "scenario": "fixed_on_retry",
-      "fixtureCount": 6,
-      "parseSuccessCount": 6,
-      "usedRetryCount": 6,
-      "retryRescuedCount": 6,
+      "fixtureCount": 9,
+      "parseSuccessCount": 9,
+      "usedRetryCount": 9,
+      "retryRescuedCount": 9,
       "outcomes": {
-        "success": 6,
+        "success": 9,
         "draft": 0,
         "validation_skip": 0,
         "parse_error": 0
@@ -120,7 +144,31 @@
           "outcome": "success"
         },
         {
+          "fixture": "schedule-noop-http-ping.json",
+          "scenario": "fixed_on_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
+        },
+        {
           "fixture": "sync-crm-with-custom-nodes.json",
+          "scenario": "fixed_on_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
+        },
+        {
+          "fixture": "webhook-http-ping.json",
+          "scenario": "fixed_on_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": true,
+          "outcome": "success"
+        },
+        {
+          "fixture": "webhook-if-http-ping.json",
           "scenario": "fixed_on_retry",
           "parseSuccess": true,
           "usedRetry": true,
@@ -131,13 +179,13 @@
     },
     {
       "scenario": "still_broken_after_retry",
-      "fixtureCount": 6,
-      "parseSuccessCount": 6,
-      "usedRetryCount": 6,
+      "fixtureCount": 9,
+      "parseSuccessCount": 9,
+      "usedRetryCount": 9,
       "retryRescuedCount": 0,
       "outcomes": {
         "success": 0,
-        "draft": 6,
+        "draft": 9,
         "validation_skip": 0,
         "parse_error": 0
       },
@@ -183,7 +231,31 @@
           "outcome": "draft"
         },
         {
+          "fixture": "schedule-noop-http-ping.json",
+          "scenario": "still_broken_after_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": false,
+          "outcome": "draft"
+        },
+        {
           "fixture": "sync-crm-with-custom-nodes.json",
+          "scenario": "still_broken_after_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": false,
+          "outcome": "draft"
+        },
+        {
+          "fixture": "webhook-http-ping.json",
+          "scenario": "still_broken_after_retry",
+          "parseSuccess": true,
+          "usedRetry": true,
+          "retryRescued": false,
+          "outcome": "draft"
+        },
+        {
+          "fixture": "webhook-if-http-ping.json",
           "scenario": "still_broken_after_retry",
           "parseSuccess": true,
           "usedRetry": true,
@@ -194,7 +266,7 @@
     },
     {
       "scenario": "unparseable_first_try",
-      "fixtureCount": 6,
+      "fixtureCount": 9,
       "parseSuccessCount": 0,
       "usedRetryCount": 0,
       "retryRescuedCount": 0,
@@ -202,7 +274,7 @@
         "success": 0,
         "draft": 0,
         "validation_skip": 0,
-        "parse_error": 6
+        "parse_error": 9
       },
       "fixtures": [
         {
@@ -246,7 +318,31 @@
           "outcome": "parse_error"
         },
         {
+          "fixture": "schedule-noop-http-ping.json",
+          "scenario": "unparseable_first_try",
+          "parseSuccess": false,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "parse_error"
+        },
+        {
           "fixture": "sync-crm-with-custom-nodes.json",
+          "scenario": "unparseable_first_try",
+          "parseSuccess": false,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "parse_error"
+        },
+        {
+          "fixture": "webhook-http-ping.json",
+          "scenario": "unparseable_first_try",
+          "parseSuccess": false,
+          "usedRetry": false,
+          "retryRescued": false,
+          "outcome": "parse_error"
+        },
+        {
+          "fixture": "webhook-if-http-ping.json",
           "scenario": "unparseable_first_try",
           "parseSuccess": false,
           "usedRetry": false,

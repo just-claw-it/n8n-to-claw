@@ -49,7 +49,12 @@ an exact lookup table and a prefix-based fallback. The category determines:
 
 ## Deterministic transpilation
 
-If the workflow is a linear `main` path — an allowed schedule / manual / cron / interval / start trigger, then only HTTP Request nodes, each `GET` with a static URL, no `={{…}}` expressions, no credentials, no disabled nodes — `transpile()` emits `SKILL.md` and `skill.ts` from the template in `src/transpile/deterministic/linear-http-chain.ts` and validates with `tsc` **without calling the LLM**. A `transpileWarnings` entry with reason `deterministic_transpile` is added.
+If the workflow matches a supported **deterministic HTTP template** in `src/transpile/deterministic/linear-http-chain.ts`, `transpile()` emits `SKILL.md` and `skill.ts` and validates with `tsc` **without calling the LLM**. A `transpileWarnings` entry with reason `deterministic_transpile` is added.
+
+Supported shapes (all nodes active, no credentials, no `={{…}}` except the allowed IF left-hand side below):
+
+- **Linear:** trigger (`schedule` / `manual` / `cron` / `interval` / `start` / **`webhook`**) → optional **`noOp` / `set` (static only)** → one or more **`httpRequest`** nodes, each `GET` with a static URL, single `main` output index `0` throughout.
+- **IF + HTTP:** same trigger and optional pass-through prefix → **`if`** with a single string-equals condition on `={{ $json.field[.nested]* }}` vs a static `rightValue` → **true** branch: optional pass-through then the same HTTP GET chain; **false** branch: a single **`noOp`** sink. Generated `skill.ts` reads JSON from stdin, evaluates the condition, then runs the GETs or exits after a skip message.
 
 To always use the LLM (e.g. tests), set env `N8N_TO_CLAW_FORCE_LLM=1` or pass `{ forceLlm: true }` as the second argument to `transpile()` (see `TranspileOptions` in `transpile.ts`).
 

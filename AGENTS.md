@@ -8,7 +8,7 @@ agents to understand the codebase before working on it.
 `n8n-to-claw` is a CLI tool that converts [n8n](https://n8n.io) workflow JSON
 into [OpenClaw](https://openclaw.ai)-compatible skills (`SKILL.md` + `skill.ts`).
 Transpilation is usually an LLM call; **deterministic templates** handle some
-linear “schedule/manual → HTTP GET” workflows without the LLM (see
+deterministic HTTP templates (linear or IF + GET chain; webhook allowed; see
 `src/transpile/deterministic/linear-http-chain.ts`).
 
 ## Architecture — three-stage pipeline
@@ -45,7 +45,7 @@ src/
     output-parser.ts       — Extract SKILL.md + skill.ts from LLM response
     validate.ts            — Run tsc --noEmit on generated skill.ts
     deterministic/
-      linear-http-chain.ts — Template path: linear trigger + HTTP GET chain (no LLM)
+      linear-http-chain.ts — Deterministic templates: linear / IF + HTTP GET (no LLM)
     transpile.ts           — Template first, else LLM → validate → retry → draft fallback
     *.test.ts
   utils/
@@ -69,6 +69,10 @@ test-fixtures/
   ai-support-chatbot.json         — LangChain AI agent with ai_* connections
   daily-hacker-news-digest.json   — Cron → HTTP → Code → Email
   sync-crm-with-custom-nodes.json — Community node, stickyNote, Google Sheets
+  schedule-http-ping.json         — Deterministic: schedule → HTTP GET chain
+  webhook-http-ping.json          — Deterministic: webhook → HTTP GET chain
+  schedule-noop-http-ping.json    — Deterministic: schedule → noOp → HTTP GET
+  webhook-if-http-ping.json       — Deterministic: webhook → IF ($json field) → HTTP / noOp
 
 examples/
   github-pr-review-notifier/      — Sample SKILL.md + skill.ts output

@@ -1,0 +1,48 @@
+{
+  "id": "wf-deterministic-schedule-noop",
+  "name": "Schedule NoOp HTTP Ping",
+  "nodes": [
+    {
+      "id": "n1000001-0001-0001-0001-000000000001",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 * * * *" }]
+        }
+      }
+    },
+    {
+      "id": "n1000002-0002-0002-0002-000000000002",
+      "name": "Pass Through",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "parameters": {}
+    },
+    {
+      "id": "n1000003-0003-0003-0003-000000000003",
+      "name": "Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [400, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://example.net/ping",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [[{ "node": "Pass Through", "type": "main", "index": 0 }]]
+    },
+    "Pass Through": {
+      "main": [[{ "node": "Health Check", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

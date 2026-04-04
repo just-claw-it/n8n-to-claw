@@ -1,15 +1,15 @@
 {
   "promptVersion": "v1",
-  "fixtureCount": 6,
+  "fixtureCount": 9,
   "totals": {
-    "nodes": 30,
-    "edges": 24,
-    "warnings": 26,
+    "nodes": 40,
+    "edges": 31,
+    "warnings": 29,
     "unknownNodes": 1,
-    "expressionNodes": 13,
+    "expressionNodes": 14,
     "credentialRefs": 8,
-    "promptChars": 51296,
-    "estimatedTokens": 12826
+    "promptChars": 72272,
+    "estimatedTokens": 18071
   },
   "fixtures": [
     {
@@ -78,6 +78,19 @@
       "estimatedTokens": 1681
     },
     {
+      "fixture": "schedule-noop-http-ping.json",
+      "workflowName": "Schedule NoOp HTTP Ping",
+      "triggerType": "schedule",
+      "nodeCount": 3,
+      "edgeCount": 2,
+      "warningCount": 0,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 0,
+      "credentialRefCount": 0,
+      "promptChars": 6623,
+      "estimatedTokens": 1656
+    },
+    {
       "fixture": "sync-crm-with-custom-nodes.json",
       "workflowName": "Sync CRM Contacts to Google Sheets",
       "triggerType": "schedule",
@@ -89,6 +102,32 @@
       "credentialRefCount": 2,
       "promptChars": 8873,
       "estimatedTokens": 2219
+    },
+    {
+      "fixture": "webhook-http-ping.json",
+      "workflowName": "Webhook HTTP Ping",
+      "triggerType": "webhook",
+      "nodeCount": 3,
+      "edgeCount": 2,
+      "warningCount": 1,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 0,
+      "credentialRefCount": 0,
+      "promptChars": 6894,
+      "estimatedTokens": 1724
+    },
+    {
+      "fixture": "webhook-if-http-ping.json",
+      "workflowName": "Webhook If HTTP Ping",
+      "triggerType": "webhook",
+      "nodeCount": 4,
+      "edgeCount": 3,
+      "warningCount": 2,
+      "unknownNodeCount": 0,
+      "expressionNodeCount": 1,
+      "credentialRefCount": 0,
+      "promptChars": 7459,
+      "estimatedTokens": 1865
     }
   ]
 }

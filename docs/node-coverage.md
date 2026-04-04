@@ -7,15 +7,15 @@ This file is **generated** — run `npm run coverage:nodes` from the repo root a
 | Metric | Value |
 |--------|------:|
 | Explicit entries in `EXACT_MAP` | 479 |
-| Workflow JSON files scanned | 6 |
+| Workflow JSON files scanned | 9 |
 | Unique node-type strings in fixtures | 19 |
-| Total node instances (non-sticky) | 30 |
+| Total node instances (non-sticky) | 40 |
 
 ### Mapping source (per node *instance* in fixtures)
 
 | Source | Instances |
 |--------|----------:|
-| `exact_map` | 29 |
+| `exact_map` | 39 |
 | `prefix_fallback` | 0 |
 | `suffix_trigger` | 0 |
 | `unknown` | 1 |
@@ -26,12 +26,12 @@ This file is **generated** — run `npm run coverage:nodes` from the repo root a
 |----------|----------:|
 | `database` | 1 |
 | `email` | 1 |
-| `flow` | 3 |
-| `http` | 7 |
+| `flow` | 6 |
+| `http` | 11 |
 | `transform` | 10 |
-| `trigger` | 4 |
+| `trigger` | 5 |
 | `unknown` | 1 |
-| `webhook` | 3 |
+| `webhook` | 5 |
 
 ## Fixtures
 
@@ -42,7 +42,10 @@ This file is **generated** — run `npm run coverage:nodes` from the repo root a
 | `github-webhook-to-slack.json` | 5 | 5 |
 | `notify-slack-on-postgres.json` | 5 | 5 |
 | `schedule-http-ping.json` | 3 | 2 |
+| `schedule-noop-http-ping.json` | 3 | 3 |
 | `sync-crm-with-custom-nodes.json` | 5 | 5 |
+| `webhook-http-ping.json` | 3 | 2 |
+| `webhook-if-http-ping.json` | 4 | 4 |
 
 ## Node types in fixtures
 
@@ -55,17 +58,17 @@ This file is **generated** — run `npm run coverage:nodes` from the repo root a
 | `n8n-nodes-base.code` | `transform` | `exact_map` | 1 | `daily-hacker-news-digest.json` |
 | `n8n-nodes-base.emailSend` | `email` | `exact_map` | 1 | `daily-hacker-news-digest.json` |
 | `n8n-nodes-base.googleSheets` | `http` | `exact_map` | 1 | `sync-crm-with-custom-nodes.json` |
-| `n8n-nodes-base.httpRequest` | `http` | `exact_map` | 5 | `daily-hacker-news-digest.json`, `notify-slack-on-postgres.json`, `schedule-http-ping.json` |
-| `n8n-nodes-base.if` | `flow` | `exact_map` | 2 | `github-webhook-to-slack.json`, `notify-slack-on-postgres.json` |
+| `n8n-nodes-base.httpRequest` | `http` | `exact_map` | 9 | `daily-hacker-news-digest.json`, `notify-slack-on-postgres.json`, `schedule-http-ping.json`, `schedule-noop-http-ping.json`, `webhook-http-ping.json`, `webhook-if-http-ping.json` |
+| `n8n-nodes-base.if` | `flow` | `exact_map` | 3 | `github-webhook-to-slack.json`, `notify-slack-on-postgres.json`, `webhook-if-http-ping.json` |
 | `n8n-nodes-base.limit` | `transform` | `exact_map` | 1 | `daily-hacker-news-digest.json` |
-| `n8n-nodes-base.noOp` | `flow` | `exact_map` | 1 | `github-webhook-to-slack.json` |
+| `n8n-nodes-base.noOp` | `flow` | `exact_map` | 3 | `github-webhook-to-slack.json`, `schedule-noop-http-ping.json`, `webhook-if-http-ping.json` |
 | `n8n-nodes-base.postgres` | `database` | `exact_map` | 1 | `notify-slack-on-postgres.json` |
 | `n8n-nodes-base.removeDuplicates` | `transform` | `exact_map` | 1 | `sync-crm-with-custom-nodes.json` |
 | `n8n-nodes-base.respondToWebhook` | `webhook` | `exact_map` | 1 | `ai-support-chatbot.json` |
-| `n8n-nodes-base.scheduleTrigger` | `trigger` | `exact_map` | 4 | `daily-hacker-news-digest.json`, `notify-slack-on-postgres.json`, `schedule-http-ping.json`, `sync-crm-with-custom-nodes.json` |
+| `n8n-nodes-base.scheduleTrigger` | `trigger` | `exact_map` | 5 | `daily-hacker-news-digest.json`, `notify-slack-on-postgres.json`, `schedule-http-ping.json`, `schedule-noop-http-ping.json`, `sync-crm-with-custom-nodes.json` |
 | `n8n-nodes-base.set` | `transform` | `exact_map` | 3 | `github-webhook-to-slack.json`, `notify-slack-on-postgres.json`, `sync-crm-with-custom-nodes.json` |
 | `n8n-nodes-base.slack` | `http` | `exact_map` | 1 | `github-webhook-to-slack.json` |
-| `n8n-nodes-base.webhook` | `webhook` | `exact_map` | 2 | `ai-support-chatbot.json`, `github-webhook-to-slack.json` |
+| `n8n-nodes-base.webhook` | `webhook` | `exact_map` | 4 | `ai-support-chatbot.json`, `github-webhook-to-slack.json`, `webhook-http-ping.json`, `webhook-if-http-ping.json` |
 | `n8n-nodes-community.customCrm` | `unknown` | `unknown` | 1 | `sync-crm-with-custom-nodes.json` |
 
 ## Interpretation

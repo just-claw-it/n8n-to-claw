@@ -3,7 +3,7 @@ import { callLLM, loadLLMConfig, type LLMConfig, type LLMMessage } from "./llm.j
 import { buildTranspilePrompt, buildRetryPrompt } from "./prompt.js";
 import { parseLLMOutput, type TranspileOutput, ParseOutputError } from "./output-parser.js";
 import { validateTypeScript } from "./validate.js";
-import { tryDeterministicLinearHttpGet } from "./deterministic/linear-http-chain.js";
+import { tryDeterministicHttpTemplate } from "./deterministic/linear-http-chain.js";
 
 /** Optional second argument to `transpile()`, or pass a bare `LLMConfig` (web API). */
 export interface TranspileOptions {
@@ -47,7 +47,7 @@ function deterministicTranspileWarning(ir: WorkflowIR): IRWarning {
     nodeType: "n8n-to-claw.deterministic",
     reason: "deterministic_transpile",
     detail:
-      "Skill generated with deterministic linear HTTP GET template (no LLM call).",
+      "Skill generated with deterministic HTTP template (linear or IF + GET chain; no LLM call).",
   };
 }
 
@@ -100,7 +100,7 @@ export async function transpile(
   const transpileWarnings: IRWarning[] = [];
 
   if (!forceLlm) {
-    const det = tryDeterministicLinearHttpGet(ir);
+    const det = tryDeterministicHttpTemplate(ir);
     if (det !== null) {
       const detValidation = await validateTypeScript(det.skillTs);
       if (detValidation.valid) {

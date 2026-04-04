@@ -90,7 +90,7 @@ Derived from the trigger node type. Drives the OpenClaw skill metadata.
 | `"unsupported_parameter"` | Parameter shape not understood by parser |
 | `"dangling_edge"` | Connection references a node not in the node list |
 | `"transpile_validation"` | Transpile-phase validation issue (tsc failure/skip) |
-| `"deterministic_transpile"` | Output from non-LLM deterministic template (e.g. linear HTTP GET chain) |
+| `"deterministic_transpile"` | Output from non-LLM deterministic HTTP template (linear or IF + GET chain) |
 
 ## IRQuality
 
