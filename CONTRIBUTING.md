@@ -57,7 +57,7 @@ Changes to `src/ir/types.ts` are high-impact. Before proposing one:
 - [ ] `npm test` passes (full suite)
 - [ ] `npm run typecheck` passes
 - [ ] If you changed the web UI: `cd web && npm run typecheck && npm run build` (PowerShell 5: `cd web; npm run typecheck; npm run build`)
-- [ ] If you added/changed `test-fixtures/` or `src/parse/categorize.ts`: run `npm run coverage:nodes` and commit `docs/node-coverage.md`
+- [ ] If you added/changed `test-fixtures/` or `src/parse/categorize.ts`: run `npm run coverage:nodes` and commit `docs/node-coverage.md` (CI enforces parity)
 - [ ] If you changed Docker files: `docker build -t n8n-to-claw:local .` (from repo root)
 - [ ] New node types or behavior documented in `README.md` / `CHANGELOG.md` as appropriate
 - [ ] `CHANGELOG.md` has an entry under `[Unreleased]` when the change is user-visible

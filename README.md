@@ -191,7 +191,7 @@ All degraded nodes are listed in `warnings.json` with name, type, and reason.
 
 ## Node coverage
 
-A **[generated dashboard](docs/node-coverage.md)** lists every node type that appears in `test-fixtures/`, its resolved category, and whether it was mapped via `EXACT_MAP`, a prefix/suffix fallback, or `unknown`. Regenerate it with `npm run coverage:nodes` (requires a successful `npm run build`).
+A **[generated dashboard](docs/node-coverage.md)** lists every node type that appears in `test-fixtures/`, its resolved category, and whether it was mapped via `EXACT_MAP`, a prefix/suffix fallback, or `unknown`. Regenerate it with `npm run coverage:nodes` (requires a successful `npm run build`). After `npm run build`, you can refresh only the markdown with `npm run coverage:nodes:write`. CI fails if the committed file does not match a fresh regeneration.
 
 **479 node types** are explicitly mapped (sourced from n8n v2.13 `packages/nodes-base/package.json` + `@n8n/n8n-nodes-langchain`). Run `n8n-to-claw convert <file> --inspect` to see the full list.
 
@@ -365,7 +365,7 @@ mock output, then run `npm test`.
 
 Or run `./scripts/setup.sh` from the repo root to install, typecheck, test, and build in one go.
 
-CI runs on **Node.js 20** and **22** (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)): typecheck, tests, CLI build, web install/typecheck/build, and a Docker image build on Node 20.
+CI runs on **Node.js 20** and **22** (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)): typecheck, tests, CLI build, a check that [`docs/node-coverage.md`](docs/node-coverage.md) matches `test-fixtures/` and `categorize.ts` (regenerate with `npm run coverage:nodes`), web install/typecheck/build, and a Docker image build on Node 20.
 
 ### Web UI development
 

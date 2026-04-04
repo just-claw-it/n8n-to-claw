@@ -161,8 +161,9 @@ LLM_MAX_TOKENS — optional; default 4096; lower can speed local models (truncat
 - `src/coverage/node-coverage.test.ts` exercises the fixture scan + markdown
   generator for `docs/node-coverage.md` (`npm run coverage:nodes`)
 - GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, tests, CLI build,
-  smoke `--help`, then `web/` install, typecheck, and Vite build; on Node 20 only,
-  `docker build` verifies the `Dockerfile`
+  regenerates `docs/node-coverage.md` and fails if it differs from the committed
+  file, smoke `--help`, then `web/` install, typecheck, and Vite build; on Node 20
+  only, `docker build` verifies the `Dockerfile`
 
 ## Local improvement backlog (optional)
 

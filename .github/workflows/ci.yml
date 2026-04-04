@@ -36,6 +36,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify node coverage doc matches test-fixtures
+        run: |
+          node dist/coverage/run-node-coverage.js
+          if ! git diff --quiet HEAD -- docs/node-coverage.md; then
+            echo "::error::docs/node-coverage.md is out of date. Run: npm run coverage:nodes"
+            git --no-pager diff HEAD -- docs/node-coverage.md
+            exit 1
+          fi
+
       - name: Smoke test binary
         run: node dist/cli/index.js --help
 

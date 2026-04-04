@@ -29,7 +29,8 @@
     "eval:prompt:update": "npm run build && node dist/evals/run-prompt-eval.js docs/prompt-evals/prompt-v1-baseline.json",
     "eval:quality": "npm run build && node dist/evals/run-transpile-quality-eval.js",
     "eval:quality:update": "npm run build && node dist/evals/run-transpile-quality-eval.js docs/prompt-evals/transpile-quality-v1-baseline.json",
-    "coverage:nodes": "npm run build && node dist/coverage/run-node-coverage.js"
+    "coverage:nodes": "npm run build && node dist/coverage/run-node-coverage.js",
+    "coverage:nodes:write": "node dist/coverage/run-node-coverage.js"
   },
   "dependencies": {
     "typescript": "^5.4.0"

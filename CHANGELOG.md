@@ -6,6 +6,9 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **CI** — after the CLI build, regenerates `docs/node-coverage.md` and fails if it differs from the committed file (keeps the node coverage dashboard in sync with `test-fixtures/` and `categorize.ts`)
+
 ## [0.3.0] — 2026-03-24
 
 ### Added
