@@ -20,6 +20,7 @@ import { transpile, TranspileError } from "../transpile/transpile.js";
 import { LLMError, loadLLMConfig, probeLlmConnection } from "../transpile/llm.js";
 import { buildTranspilePrompt } from "../transpile/prompt.js";
 import { packageSkill } from "../package/package.js";
+import { writeDebugBundle } from "./debug-bundle.js";
 import { enableVerbose, logger } from "../utils/logger.js";
 import { knownNodeTypes } from "../parse/categorize.js";
 
@@ -47,6 +48,7 @@ Options:
 Flags:
   --dry-run        Parse only: print IR summary + warnings, skip LLM + write
   --inspect        Print full IR as JSON + the LLM prompt, then exit (no LLM call)
+  --debug-bundle   Write debug-bundle/ with IR, prompts, LLM output, and validation traces
   --verbose        Print LLM prompt, raw response, and tsc output to stderr
   --version        Print version and exit
   --help, -h       Show this help
@@ -96,6 +98,7 @@ interface CLIArgs {
   outputDir?: string | undefined;
   dryRun: boolean;
   inspect: boolean;
+  debugBundle: boolean;
   verbose: boolean;
   force: boolean;
 }
@@ -122,6 +125,7 @@ function parseCliArgs(): CLIArgs | "help" | "version" {
         "output-dir": { type: "string" },
         "dry-run": { type: "boolean", default: false },
         "inspect": { type: "boolean", default: false },
+        "debug-bundle": { type: "boolean", default: false },
         "verbose": { type: "boolean", default: false },
         "force": { type: "boolean", default: false },
         "version": { type: "boolean", short: "v", default: false },
@@ -151,6 +155,7 @@ function parseCliArgs(): CLIArgs | "help" | "version" {
   const args: CLIArgs = {
     dryRun: values["dry-run"] === true,
     inspect: values["inspect"] === true,
+    debugBundle: values["debug-bundle"] === true,
     verbose: values["verbose"] === true,
     force: values["force"] === true,
   };
@@ -393,6 +398,19 @@ async function main(): Promise<void> {
   process.stdout.write(`${pkg.skillDir}\n`);
   process.stderr.write(`\n✓ Skill written to:\n  ${pkg.skillDir}\n`);
   process.stderr.write(`  Files: ${pkg.filesWritten.join(", ")}\n`);
+
+  if (args.debugBundle) {
+    const debugFiles = await writeDebugBundle({
+      skillDir: pkg.skillDir,
+      source: isFileMode
+        ? { mode: "file", file: args.file }
+        : { mode: "api", n8nUrl: args.n8nUrl, workflowId: args.workflowId },
+      ir,
+      parseWarnings: ir.warnings,
+      transpileResult,
+    });
+    process.stderr.write(`  Debug bundle: ${debugFiles.join(", ")}\n`);
+  }
 
   if (allWarnings.length > 0) {
     process.stderr.write(`\n⚠ ${allWarnings.length} warning(s) — see warnings.json for full detail:\n`);

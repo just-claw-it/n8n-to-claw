@@ -67,6 +67,9 @@ n8n-to-claw convert workflow.json --dry-run
 # Print full IR + prompt + known node list, then exit (no LLM call)
 n8n-to-claw convert workflow.json --inspect
 
+# Write a reproducible debug bundle (IR + prompts + LLM + validation traces)
+n8n-to-claw convert workflow.json --debug-bundle
+
 # Print LLM prompt + raw response + tsc output to stderr
 n8n-to-claw convert workflow.json --verbose
 
@@ -87,6 +90,13 @@ n8n-to-claw check-llm
 ```bash
 DEBUG=n8n-to-claw n8n-to-claw convert workflow.json
 ```
+
+**Debug bundle artifacts (`--debug-bundle`):**
+- `debug-bundle/meta.json` — source, status, model/timeouts, retry history
+- `debug-bundle/ir.json` — normalized IR snapshot (raw payload stripped)
+- `debug-bundle/warnings.parse.json` + `warnings.transpile.json`
+- `debug-bundle/prompt-attempt-<n>.txt` + `llm-response-attempt-<n>.txt`
+- `debug-bundle/validation-attempt-<n>.json`
 
 ## Environment variables
 

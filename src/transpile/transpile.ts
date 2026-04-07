@@ -12,6 +12,23 @@ export interface TranspileOptions {
   forceLlm?: boolean;
 }
 
+export interface TranspileAttemptDebug {
+  attempt: number;
+  messages: LLMMessage[];
+  rawLlmOutput?: string | undefined;
+  parseError?: string | undefined;
+  validation: {
+    valid: boolean;
+    error?: string | undefined;
+  };
+}
+
+export interface TranspileDebugInfo {
+  path: "deterministic" | "llm";
+  forceLlm: boolean;
+  attempts: TranspileAttemptDebug[];
+}
+
 function isLLMConfigShape(x: unknown): x is LLMConfig {
   if (typeof x !== "object" || x === null) return false;
   const o = x as Record<string, unknown>;
@@ -79,6 +96,8 @@ export interface TranspileResult {
   validationError?: string | undefined;
   /** Warnings accumulated during transpilation (in addition to parse warnings) */
   transpileWarnings: IRWarning[];
+  /** Optional runtime trace for diagnostics/debug bundle output. */
+  debug: TranspileDebugInfo;
 }
 
 export class TranspileError extends Error {
@@ -98,17 +117,32 @@ export async function transpile(
 ): Promise<TranspileResult> {
   const { llmConfig: injectedLlmConfig, forceLlm } = resolveTranspileInput(second);
   const transpileWarnings: IRWarning[] = [];
+  const debug: TranspileDebugInfo = {
+    path: "llm",
+    forceLlm,
+    attempts: [],
+  };
 
   if (!forceLlm) {
     const det = tryDeterministicHttpTemplate(ir);
     if (det !== null) {
       const detValidation = await validateTypeScript(det.skillTs);
+      debug.path = "deterministic";
+      debug.attempts.push({
+        attempt: 1,
+        messages: [],
+        validation: {
+          valid: detValidation.valid,
+          ...(detValidation.error !== undefined ? { error: detValidation.error } : {}),
+        },
+      });
       if (detValidation.valid) {
         transpileWarnings.push(deterministicTranspileWarning(ir));
         return {
           status: "success",
           output: det,
           transpileWarnings,
+          debug,
         };
       }
       if (isValidationSkippedError(detValidation.error)) {
@@ -124,6 +158,7 @@ export async function transpile(
           status: "validation_skip",
           output: det,
           transpileWarnings,
+          debug,
         };
       }
       // Template failed tsc — unusual; fall through to LLM.
@@ -134,13 +169,15 @@ export async function transpile(
 
   // ---- Attempt 1 ----
   const messages = buildTranspilePrompt(ir);
-  const attempt1 = await runAttempt(llmConfig, messages);
+  const attempt1 = await runAttempt(llmConfig, messages, 1);
+  debug.attempts.push(attempt1.debug);
 
   if (attempt1.validationResult.valid) {
     return {
       status: "success",
       output: attempt1.output,
       transpileWarnings,
+      debug,
     };
   }
 
@@ -157,6 +194,7 @@ export async function transpile(
       status: "validation_skip",
       output: attempt1.output,
       transpileWarnings,
+      debug,
     };
   }
 
@@ -167,13 +205,15 @@ export async function transpile(
     attempt1.validationResult.error!
   );
 
-  const attempt2 = await runAttempt(llmConfig, retryMessages);
+  const attempt2 = await runAttempt(llmConfig, retryMessages, 2);
+  debug.attempts.push(attempt2.debug);
 
   if (attempt2.validationResult.valid) {
     return {
       status: "success",
       output: attempt2.output,
       transpileWarnings,
+      debug,
     };
   }
 
@@ -193,6 +233,7 @@ export async function transpile(
       ? { validationError: attempt2.validationResult.error }
       : {}),
     transpileWarnings,
+    debug,
   };
 }
 
@@ -202,10 +243,12 @@ export async function transpile(
 
 async function runAttempt(
   config: LLMConfig,
-  messages: LLMMessage[]
+  messages: LLMMessage[],
+  attemptNum: number
 ): Promise<{
   output: TranspileOutput;
   validationResult: { valid: boolean; error?: string };
+  debug: TranspileAttemptDebug;
 }> {
   const llmResponse = await callLLM(config, messages, {
     temperature: 0.2,
@@ -216,8 +259,9 @@ async function runAttempt(
     output = parseLLMOutput(llmResponse.content);
   } catch (err: unknown) {
     if (err instanceof ParseOutputError) {
+      const parseErrMsg = `Failed to parse LLM output into SKILL.md + skill.ts: ${err.message}`;
       throw new TranspileError(
-        `Failed to parse LLM output into SKILL.md + skill.ts: ${err.message}`
+        parseErrMsg
       );
     }
     throw err;
@@ -225,7 +269,19 @@ async function runAttempt(
 
   const validationResult = await validateTypeScript(output.skillTs);
 
-  return { output, validationResult };
+  return {
+    output,
+    validationResult,
+    debug: {
+      attempt: attemptNum,
+      messages,
+      rawLlmOutput: llmResponse.content,
+      validation: {
+        valid: validationResult.valid,
+        ...(validationResult.error !== undefined ? { error: validationResult.error } : {}),
+      },
+    },
+  };
 }
 
 /**

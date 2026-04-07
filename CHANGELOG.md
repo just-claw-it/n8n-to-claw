@@ -8,6 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 - **Deterministic templates (§1)** — `webhook` as a supported trigger alongside schedule/manual/cron; optional `noOp` / static `set` pass-through before HTTP GETs; **IF + HTTP** path when the IF node has a single string-equals rule on `={{ $json.field… }}` vs a static value, true branch = HTTP GET chain, false branch = single `noOp`. New fixtures: `webhook-http-ping.json`, `schedule-noop-http-ping.json`, `webhook-if-http-ping.json`. Entry point: `tryDeterministicHttpTemplate()` in `linear-http-chain.ts`.
+- **`--debug-bundle` CLI flag (§9)** — writes `debug-bundle/` with IR snapshot, parse/transpile warnings, per-attempt prompts, raw LLM responses, validation results, and retry/path metadata for reproducible debugging.
 
 ### Changed
 - **CI** — after the CLI build, regenerates `docs/node-coverage.md` and fails if it differs from the committed file (keeps the node coverage dashboard in sync with `test-fixtures/` and `categorize.ts`)

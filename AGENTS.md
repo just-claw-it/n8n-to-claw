@@ -57,6 +57,7 @@ src/
     node-coverage.ts       — Scan test-fixtures → mapping stats; `npm run coverage:nodes`
   cli/
     index.ts               — CLI entry point (parseArgs, orchestrates all stages)
+    debug-bundle.ts        — Writes reproducible transpile debug artifacts per run
   integration.test.ts      — Full pipeline tests with mocked LLM
 
 skills/
