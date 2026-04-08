@@ -86,6 +86,8 @@ Derived from the trigger node type. Drives the OpenClaw skill metadata.
 | `"credential_reference"` | Node uses credentials |
 | `"webhook_trigger"` | Webhook trigger detected |
 | `"database_node"` | Database node detected |
+| `"code_execution_node"` | Code node detected (manual security/runtime review required) |
+| `"ai_agent_node"` | AI/LangChain node detected (model/tool/data-path review required) |
 | `"expression_present"` | n8n expression found in parameters |
 | `"unsupported_parameter"` | Parameter shape not understood by parser |
 | `"dangling_edge"` | Connection references a node not in the node list |

@@ -128,6 +128,40 @@ describe("parse()", () => {
     expect(ir.warnings.some((w) => w.reason === "expression_present")).toBe(true);
   });
 
+  it("emits code_execution_node warning for Code nodes", () => {
+    const wf: N8nWorkflowJson = {
+      name: "Code Flow",
+      nodes: [
+        {
+          id: "code1",
+          name: "Format Data",
+          type: "n8n-nodes-base.code",
+          parameters: { jsCode: "return items;" },
+        },
+      ],
+      connections: {},
+    };
+    const ir = parse(wf);
+    expect(ir.warnings.some((w) => w.reason === "code_execution_node")).toBe(true);
+  });
+
+  it("emits ai_agent_node warning for LangChain nodes", () => {
+    const wf: N8nWorkflowJson = {
+      name: "AI Flow",
+      nodes: [
+        {
+          id: "ai1",
+          name: "Agent",
+          type: "@n8n/n8n-nodes-langchain.agent",
+          parameters: {},
+        },
+      ],
+      connections: {},
+    };
+    const ir = parse(wf);
+    expect(ir.warnings.some((w) => w.reason === "ai_agent_node")).toBe(true);
+  });
+
   it("collects and deduplicates credential refs", () => {
     const wf: N8nWorkflowJson = {
       name: "Cred Flow",

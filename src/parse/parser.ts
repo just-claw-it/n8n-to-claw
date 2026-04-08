@@ -109,6 +109,28 @@ function parseNode(raw: N8nRawNode, warnings: IRWarning[]): IRNode {
     });
   }
 
+  if (type === "n8n-nodes-base.code") {
+    warnings.push({
+      nodeId: id,
+      nodeName: name,
+      nodeType: type,
+      reason: "code_execution_node",
+      detail:
+        "Code node detected. Generated output must be manually reviewed for runtime behavior and security.",
+    });
+  }
+
+  if (type.startsWith("@n8n/n8n-nodes-langchain")) {
+    warnings.push({
+      nodeId: id,
+      nodeName: name,
+      nodeType: type,
+      reason: "ai_agent_node",
+      detail:
+        "AI/LangChain node detected. Review model/tool calls, prompts, and data handling before production use.",
+    });
+  }
+
   if (hasExpressions) {
     warnings.push({
       nodeId: id,

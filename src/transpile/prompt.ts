@@ -83,6 +83,13 @@ A self-contained Node.js CLI script with NO external npm dependencies (only Node
 **AI/LangChain**: Use the OpenAI-compatible API via https module directly.
   Read LLM_BASE_URL, LLM_API_KEY, LLM_MODEL from env. Never hardcode model names.
 
+## High-risk review markers
+
+When a node is tagged with CODE_EXECUTION_NODE or AI_LANGCHAIN_NODE:
+- Add an explicit "Manual review required" note in SKILL.md.
+- In skill.ts, add TODO comments documenting assumptions and security-sensitive behavior.
+- Never silently infer privileged actions, shell commands, or external tool invocation.
+
 **email**: Use Node.js net/tls to send SMTP, or curl via child_process as a fallback.
   Always include a TODO if OAuth is required.
 
@@ -202,6 +209,9 @@ function serializeNode(node: IRNode): string {
   if (node.category === "database") flags.push("DATABASE_NODE");
   if (node.category === "flow" && node.type === "n8n-nodes-base.executeWorkflow") {
     flags.push("SUB_WORKFLOW");
+  }
+  if (node.type === "n8n-nodes-base.code") {
+    flags.push("CODE_EXECUTION_NODE");
   }
   if (node.type.startsWith("@n8n/n8n-nodes-langchain")) {
     flags.push("AI_LANGCHAIN_NODE");

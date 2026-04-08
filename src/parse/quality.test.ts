@@ -33,4 +33,13 @@ describe("assessIRQuality()", () => {
     expect(q.highRiskWarningCount).toBe(1);
     expect(q.level).toBe("medium");
   });
+
+  it("treats code and ai warnings as high risk", () => {
+    const q = assessIRQuality(
+      [baseWarn("code_execution_node"), baseWarn("ai_agent_node")],
+      "webhook"
+    );
+    expect(q.highRiskWarningCount).toBe(2);
+    expect(q.level === "medium" || q.level === "low").toBe(true);
+  });
 });

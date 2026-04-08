@@ -5,6 +5,8 @@ const PENALTIES: Record<string, number> = {
   dangling_edge: 14,
   unsupported_parameter: 10,
   database_node: 8,
+  code_execution_node: 10,
+  ai_agent_node: 9,
   expression_present: 5,
   credential_reference: 3,
   webhook_trigger: 1,
@@ -15,6 +17,8 @@ const HIGH_RISK_REASONS = new Set([
   "dangling_edge",
   "unsupported_parameter",
   "database_node",
+  "code_execution_node",
+  "ai_agent_node",
 ]);
 
 export interface IRQualityAssessment {

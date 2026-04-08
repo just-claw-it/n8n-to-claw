@@ -98,6 +98,51 @@ const IR_WITH_UNKNOWN_NODE: WorkflowIR = {
   ],
 };
 
+const IR_WITH_CODE_AND_AI: WorkflowIR = {
+  ...BASE_IR,
+  nodes: [
+    ...BASE_IR.nodes,
+    {
+      id: "n3",
+      name: "Code Node",
+      type: "n8n-nodes-base.code",
+      category: "transform",
+      parameters: { jsCode: "return items;" },
+      hasExpressions: false,
+      disabled: false,
+      credentials: [],
+      raw: {},
+    },
+    {
+      id: "n4",
+      name: "AI Agent",
+      type: "@n8n/n8n-nodes-langchain.agent",
+      category: "transform",
+      parameters: {},
+      hasExpressions: false,
+      disabled: false,
+      credentials: [],
+      raw: {},
+    },
+  ],
+  warnings: [
+    {
+      nodeId: "n3",
+      nodeName: "Code Node",
+      nodeType: "n8n-nodes-base.code",
+      reason: "code_execution_node",
+      detail: "Code node detected.",
+    },
+    {
+      nodeId: "n4",
+      nodeName: "AI Agent",
+      nodeType: "@n8n/n8n-nodes-langchain.agent",
+      reason: "ai_agent_node",
+      detail: "AI node detected.",
+    },
+  ],
+};
+
 // ---------------------------------------------------------------------------
 // buildTranspilePrompt tests
 // ---------------------------------------------------------------------------
@@ -165,6 +210,18 @@ describe("buildTranspilePrompt()", () => {
   it("includes parameters in node description", () => {
     const [, user] = buildTranspilePrompt(BASE_IR);
     expect(user?.content).toContain("https://api.example.com/data");
+  });
+
+  it("flags CODE_EXECUTION_NODE and AI_LANGCHAIN_NODE", () => {
+    const [, user] = buildTranspilePrompt(IR_WITH_CODE_AND_AI);
+    expect(user?.content).toContain("CODE_EXECUTION_NODE");
+    expect(user?.content).toContain("AI_LANGCHAIN_NODE");
+  });
+
+  it("system prompt includes high-risk review marker guidance", () => {
+    const [system] = buildTranspilePrompt(BASE_IR);
+    expect(system?.content).toContain("High-risk review markers");
+    expect(system?.content).toContain("Manual review required");
   });
 
   it("system prompt requires snake_case name", () => {

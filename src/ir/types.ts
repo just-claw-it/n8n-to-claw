@@ -116,6 +116,8 @@ export type IRWarningReason =
   | "credential_reference"    // credentials detected → credentials.example.env needed
   | "webhook_trigger"         // webhook trigger → mapped to OpenClaw native webhook
   | "database_node"           // DB node → bash CLI fallback or TODO stub
+  | "code_execution_node"     // custom code node detected → manual security review required
+  | "ai_agent_node"           // AI/LangChain node detected → model/tool review required
   | "expression_present"      // n8n expression found → runtime resolution needed
   | "unsupported_parameter"   // parameter shape not understood by parser
   | "dangling_edge"           // connection references a node not in the node list

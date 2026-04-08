@@ -4,12 +4,12 @@
   "totals": {
     "nodes": 40,
     "edges": 31,
-    "warnings": 29,
+    "warnings": 34,
     "unknownNodes": 1,
     "expressionNodes": 14,
     "credentialRefs": 8,
-    "promptChars": 72272,
-    "estimatedTokens": 18071
+    "promptChars": 76226,
+    "estimatedTokens": 19060
   },
   "fixtures": [
     {
@@ -18,12 +18,12 @@
       "triggerType": "webhook",
       "nodeCount": 6,
       "edgeCount": 5,
-      "warningCount": 7,
+      "warningCount": 11,
       "unknownNodeCount": 0,
       "expressionNodeCount": 3,
       "credentialRefCount": 2,
-      "promptChars": 9390,
-      "estimatedTokens": 2348
+      "promptChars": 10450,
+      "estimatedTokens": 2613
     },
     {
       "fixture": "daily-hacker-news-digest.json",
@@ -31,12 +31,12 @@
       "triggerType": "schedule",
       "nodeCount": 6,
       "edgeCount": 5,
-      "warningCount": 3,
+      "warningCount": 4,
       "unknownNodeCount": 0,
       "expressionNodeCount": 2,
       "credentialRefCount": 1,
-      "promptChars": 8536,
-      "estimatedTokens": 2134
+      "promptChars": 9064,
+      "estimatedTokens": 2266
     },
     {
       "fixture": "github-webhook-to-slack.json",
@@ -48,8 +48,8 @@
       "unknownNodeCount": 0,
       "expressionNodeCount": 3,
       "credentialRefCount": 1,
-      "promptChars": 8764,
-      "estimatedTokens": 2191
+      "promptChars": 9102,
+      "estimatedTokens": 2276
     },
     {
       "fixture": "notify-slack-on-postgres.json",
@@ -61,8 +61,8 @@
       "unknownNodeCount": 0,
       "expressionNodeCount": 3,
       "credentialRefCount": 2,
-      "promptChars": 9010,
-      "estimatedTokens": 2253
+      "promptChars": 9348,
+      "estimatedTokens": 2337
     },
     {
       "fixture": "schedule-http-ping.json",
@@ -74,8 +74,8 @@
       "unknownNodeCount": 0,
       "expressionNodeCount": 0,
       "credentialRefCount": 0,
-      "promptChars": 6723,
-      "estimatedTokens": 1681
+      "promptChars": 7061,
+      "estimatedTokens": 1766
     },
     {
       "fixture": "schedule-noop-http-ping.json",
@@ -87,8 +87,8 @@
       "unknownNodeCount": 0,
       "expressionNodeCount": 0,
       "credentialRefCount": 0,
-      "promptChars": 6623,
-      "estimatedTokens": 1656
+      "promptChars": 6961,
+      "estimatedTokens": 1741
     },
     {
       "fixture": "sync-crm-with-custom-nodes.json",
@@ -100,8 +100,8 @@
       "unknownNodeCount": 1,
       "expressionNodeCount": 2,
       "credentialRefCount": 2,
-      "promptChars": 8873,
-      "estimatedTokens": 2219
+      "promptChars": 9211,
+      "estimatedTokens": 2303
     },
     {
       "fixture": "webhook-http-ping.json",
@@ -113,8 +113,8 @@
       "unknownNodeCount": 0,
       "expressionNodeCount": 0,
       "credentialRefCount": 0,
-      "promptChars": 6894,
-      "estimatedTokens": 1724
+      "promptChars": 7232,
+      "estimatedTokens": 1808
     },
     {
       "fixture": "webhook-if-http-ping.json",
@@ -126,8 +126,8 @@
       "unknownNodeCount": 0,
       "expressionNodeCount": 1,
       "credentialRefCount": 0,
-      "promptChars": 7459,
-      "estimatedTokens": 1865
+      "promptChars": 7797,
+      "estimatedTokens": 1950
     }
   ]
 }
