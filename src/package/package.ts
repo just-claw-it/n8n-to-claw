@@ -1,8 +1,9 @@
-import { access, mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 import type { WorkflowIR, IRWarning } from "../ir/types.js";
-import type { TranspileOutput, } from "../transpile/output-parser.js";
+import type { TranspileOutput } from "../transpile/output-parser.js";
 import type { TranspileStatus } from "../transpile/transpile.js";
 
 // ---------------------------------------------------------------------------
@@ -14,12 +15,24 @@ import type { TranspileStatus } from "../transpile/transpile.js";
 //     skill.ts
 //     credentials.example.env   (if credentials are used)
 //     warnings.json
+//     skill-meta.json           (provenance + workflow fingerprint)
 //
 // Draft (failed validation):
 //   ~/.openclaw/workspace/skills/<workflow-name>/draft/
 //     SKILL.md
 //     skill.ts
 // ---------------------------------------------------------------------------
+
+/** Optional context for skill-meta.json (CLI fills source + prompt version). */
+export interface PackageProvenance {
+  source?: {
+    mode: "file" | "api";
+    file?: string | undefined;
+    n8nUrl?: string | undefined;
+    workflowId?: string | undefined;
+  };
+  promptVersion?: string | undefined;
+}
 
 export interface PackageOptions {
   /**
@@ -31,6 +44,8 @@ export interface PackageOptions {
   forceDraft?: boolean;
   /** If true, overwrite existing output without checking */
   force?: boolean;
+  /** Extra fields written into skill-meta.json */
+  provenance?: PackageProvenance;
 }
 
 export interface PackageResult {
@@ -38,6 +53,47 @@ export interface PackageResult {
   skillDir: string;
   /** Files written (relative to skillDir) */
   filesWritten: string[];
+}
+
+let cachedToolVersion: string | undefined;
+
+async function readToolVersion(): Promise<string> {
+  if (cachedToolVersion !== undefined) return cachedToolVersion;
+  try {
+    const pkgPath = new URL("../../package.json", import.meta.url);
+    const raw = await readFile(pkgPath, "utf-8");
+    const pkg = JSON.parse(raw) as Record<string, unknown>;
+    cachedToolVersion = typeof pkg["version"] === "string" ? pkg["version"] : "unknown";
+  } catch {
+    cachedToolVersion = "unknown";
+  }
+  return cachedToolVersion;
+}
+
+/** Deterministic JSON for hashing (sorted object keys at every depth). */
+function sortDeep(value: unknown): unknown {
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(sortDeep);
+  }
+  const obj = value as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const k of Object.keys(obj).sort()) {
+    out[k] = sortDeep(obj[k]);
+  }
+  return out;
+}
+
+function stableStringify(value: unknown): string {
+  return JSON.stringify(sortDeep(value));
+}
+
+function workflowFingerprint(raw: unknown): string {
+  const body = stableStringify(raw);
+  const hex = createHash("sha256").update(body, "utf-8").digest("hex");
+  return `sha256:${hex}`;
 }
 
 export async function packageSkill(
@@ -95,6 +151,32 @@ export async function packageSkill(
     "utf-8"
   );
   filesWritten.push("warnings.json");
+
+  const toolVersion = await readToolVersion();
+  const meta = {
+    schemaVersion: 1,
+    generator: {
+      name: "n8n-to-claw",
+      version: toolVersion,
+    },
+    generatedAt: new Date().toISOString(),
+    workflow: {
+      name: ir.name,
+      displayName: ir.displayName,
+      triggerType: ir.triggerType,
+      fingerprint: workflowFingerprint(ir.raw),
+    },
+    transpile: {
+      status,
+      ...(opts.provenance?.promptVersion !== undefined
+        ? { promptVersion: opts.provenance.promptVersion }
+        : {}),
+    },
+    ...(opts.provenance?.source !== undefined ? { source: opts.provenance.source } : {}),
+  };
+
+  await writeFile(join(skillDir, "skill-meta.json"), JSON.stringify(meta, null, 2), "utf-8");
+  filesWritten.push("skill-meta.json");
 
   return { skillDir, filesWritten };
 }

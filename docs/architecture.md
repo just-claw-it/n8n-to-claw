@@ -26,7 +26,8 @@ Input
                                     ├── SKILL.md
                                     ├── skill.ts
                                     ├── credentials.example.env
-                                    └── warnings.json
+                                    ├── warnings.json
+                                    └── skill-meta.json
 ```
 
 ## WorkflowIR — the central contract
@@ -138,6 +139,7 @@ for users without a global TypeScript install.
     skill.ts                  ← always written for live status
     credentials.example.env   ← only if credentialRefs.length > 0, live only
     warnings.json             ← always written (both live and draft)
+    skill-meta.json           ← provenance: tool version, ISO time, workflow fingerprint (sha256 of canonical raw JSON), transpile status, optional source + prompt version
     draft/                    ← only exists when status === "draft"
       SKILL.md
       skill.ts

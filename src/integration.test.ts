@@ -22,6 +22,7 @@ import {
   buildMockLlmTranspileResponse,
   loadGoldenTranspileFiles,
 } from "./evals/golden-transpile-helpers.js";
+import { PROMPT_VERSION } from "./transpile/prompt.js";
 
 // ---------------------------------------------------------------------------
 // Canned LLM response — same files as golden snapshot tests (notify-slack fixture)
@@ -129,7 +130,14 @@ describe("Full pipeline integration (mocked LLM)", () => {
       transpileResult.output,
       [...ir.warnings, ...transpileResult.transpileWarnings],
       transpileResult.status,
-      { outputBase, force: true }
+      {
+        outputBase,
+        force: true,
+        provenance: {
+          promptVersion: PROMPT_VERSION,
+          source: { mode: "file", file: "test-fixtures/notify-slack-on-postgres.json" },
+        },
+      }
     );
 
     // Skill directory created
@@ -155,6 +163,15 @@ describe("Full pipeline integration (mocked LLM)", () => {
     const warningsRaw = await readFile(join(pkg.skillDir, "warnings.json"), "utf-8");
     const warnings = JSON.parse(warningsRaw) as unknown[];
     expect(warnings.length).toBeGreaterThan(0);
+
+    const meta = JSON.parse(await readFile(join(pkg.skillDir, "skill-meta.json"), "utf-8")) as Record<
+      string,
+      unknown
+    >;
+    expect((meta["generator"] as Record<string, unknown>)["name"]).toBe("n8n-to-claw");
+    expect((meta["workflow"] as Record<string, unknown>)["name"]).toBe("notify-slack-on-new-postgres-row");
+    expect((meta["transpile"] as Record<string, unknown>)["status"]).toBe("success");
+    expect((meta["transpile"] as Record<string, unknown>)["promptVersion"]).toBe(PROMPT_VERSION);
   }, 30_000);
 
   it("linear schedule → HTTP GET chain uses deterministic template without callLLM", async () => {

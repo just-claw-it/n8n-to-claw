@@ -156,7 +156,8 @@ Skills are written to `~/.openclaw/workspace/skills/<workflow-name>/`:
 ├── SKILL.md                  # OpenClaw skill descriptor
 ├── skill.ts                  # Node.js implementation
 ├── credentials.example.env   # Generated if the workflow uses credentials
-└── warnings.json             # List of every degraded/stubbed node
+├── warnings.json             # List of every degraded/stubbed node
+└── skill-meta.json           # Provenance: tool version, workflow fingerprint, transpile status
 ```
 
 If the generated `skill.ts` fails TypeScript validation after two LLM attempts, the output goes to `draft/` instead:
@@ -166,7 +167,8 @@ If the generated `skill.ts` fails TypeScript validation after two LLM attempts, 
 ├── draft/
 │   ├── SKILL.md
 │   └── skill.ts              # Fix TypeScript errors, then move up one level
-└── warnings.json
+├── warnings.json
+└── skill-meta.json           # Still at skill root (includes status: draft when applicable)
 ```
 
 ## Model recommendation

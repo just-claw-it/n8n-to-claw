@@ -119,6 +119,33 @@ describe("packageSkill()", () => {
     expect(warningsJson).toHaveLength(1);
   });
 
+  it("writes skill-meta.json with workflow fingerprint and transpile status", async () => {
+    const base = await makeTempDir();
+    const ir: WorkflowIR = {
+      ...BASE_IR,
+      raw: { name: "My Workflow", nodes: [{ id: "a" }] },
+    };
+    await packageSkill(ir, SAMPLE_OUTPUT, [], "success", {
+      outputBase: base,
+      force: true,
+      provenance: { promptVersion: "v1", source: { mode: "file", file: "wf.json" } },
+    });
+
+    const meta = JSON.parse(
+      await readFile(join(base, "my-workflow", "skill-meta.json"), "utf-8")
+    ) as Record<string, unknown>;
+
+    expect(meta["schemaVersion"]).toBe(1);
+    expect((meta["generator"] as Record<string, unknown>)["name"]).toBe("n8n-to-claw");
+    expect(typeof (meta["generator"] as Record<string, unknown>)["version"]).toBe("string");
+    expect((meta["workflow"] as Record<string, unknown>)["name"]).toBe("my-workflow");
+    expect((meta["workflow"] as Record<string, unknown>)["fingerprint"]).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect((meta["transpile"] as Record<string, unknown>)["status"]).toBe("success");
+    expect((meta["transpile"] as Record<string, unknown>)["promptVersion"]).toBe("v1");
+    expect((meta["source"] as Record<string, unknown>)["mode"]).toBe("file");
+    expect((meta["source"] as Record<string, unknown>)["file"]).toBe("wf.json");
+  });
+
   it("generates credentials.example.env when credential refs are present", async () => {
     const base = await makeTempDir();
     await packageSkill(IR_WITH_CREDS, SAMPLE_OUTPUT, [], "success", { outputBase: base, force: true });
@@ -146,6 +173,7 @@ describe("packageSkill()", () => {
 
     expect(result.filesWritten).toContain("draft/SKILL.md");
     expect(result.filesWritten).toContain("draft/skill.ts");
+    expect(result.filesWritten).toContain("skill-meta.json");
 
     const exists = await fileExists(join(base, "my-workflow", "draft", "SKILL.md"));
     expect(exists).toBe(true);
@@ -153,6 +181,11 @@ describe("packageSkill()", () => {
     // Live SKILL.md should NOT exist
     const liveExists = await fileExists(join(base, "my-workflow", "SKILL.md"));
     expect(liveExists).toBe(false);
+
+    const meta = JSON.parse(
+      await readFile(join(base, "my-workflow", "skill-meta.json"), "utf-8")
+    ) as Record<string, unknown>;
+    expect((meta["transpile"] as Record<string, unknown>)["status"]).toBe("draft");
   });
 
   it("writes credentials.example.env to live dir even on draft", async () => {

@@ -51,7 +51,7 @@ src/
   utils/
     logger.ts              — DEBUG=n8n-to-claw structured logging; zero cost when disabled
   package/
-    package.ts             — Write output to ~/.openclaw/workspace/skills/<name>/
+    package.ts             — Write SKILL.md, skill.ts, warnings.json, skill-meta.json, creds example
     package.test.ts
   coverage/
     node-coverage.ts       — Scan test-fixtures → mapping stats; `npm run coverage:nodes`

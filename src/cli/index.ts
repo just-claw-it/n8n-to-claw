@@ -18,7 +18,7 @@ import { loadFromApi } from "../adapters/api.js";
 import { parse, ParseError } from "../parse/parser.js";
 import { transpile, TranspileError } from "../transpile/transpile.js";
 import { LLMError, loadLLMConfig, probeLlmConnection } from "../transpile/llm.js";
-import { buildTranspilePrompt } from "../transpile/prompt.js";
+import { buildTranspilePrompt, PROMPT_VERSION } from "../transpile/prompt.js";
 import { packageSkill } from "../package/package.js";
 import { writeDebugBundle } from "./debug-bundle.js";
 import { enableVerbose, logger } from "../utils/logger.js";
@@ -385,6 +385,12 @@ async function main(): Promise<void> {
   const pkgOpts: Parameters<typeof packageSkill>[4] = {};
   if (args.outputDir !== undefined) pkgOpts.outputBase = args.outputDir;
   if (args.force) pkgOpts.force = true;
+  pkgOpts.provenance = {
+    promptVersion: PROMPT_VERSION,
+    source: isFileMode
+      ? { mode: "file", file: args.file }
+      : { mode: "api", n8nUrl: args.n8nUrl, workflowId: args.workflowId },
+  };
   let pkg: Awaited<ReturnType<typeof packageSkill>>;
   try {
     pkg = await packageSkill(ir, transpileResult.output, allWarnings, transpileResult.status, pkgOpts);
